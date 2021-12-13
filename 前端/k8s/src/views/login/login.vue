@@ -2,7 +2,7 @@
 <div class="container-all">
   <el-alert
       style="margin:10px"
-      title="游客模式登陆-请使用邮箱: test@ng2-oa.com 验证码: 123456登陆 "
+      title="游客模式登录-请使用邮箱: test@ng2-oa.com 验证码: 123456登陆 "
       type="info">
   </el-alert>
   <el-form :model="ruleForm" :rules="rules" ref="ruleFormRef" label-width="150px" >
@@ -17,7 +17,7 @@
     </el-form-item>
 
     <el-form-item class="right" style="margin-right:20px">
-      <el-button type="primary" @click="submitForm()">立即登陆</el-button>
+      <el-button type="primary" @click="submitForm()">立即登录</el-button>
       <el-button @click="resetForm()">重置</el-button>
     </el-form-item>
   </el-form>
@@ -66,7 +66,7 @@ export default defineComponent({
       ruleFormRef.value.validateField("name",async (errorMessage:string) => {
             if (errorMessage=="") {
               if(state.ruleForm.name=="test@ng2-oa.com"){
-                ElMessage('请使用验证码123456登陆')
+                ElMessage('请使用验证码123456登录')
                 return false;
               }else{
                 try {
