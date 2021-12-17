@@ -14,11 +14,9 @@ const formatRawData = () => {
 class DWorker {
     private worker:any;
     private flagMapping:any;
-    constructor(worker = formatRawData,BASE_DATASETS={
-    }) {
+    constructor(worker = formatRawData,BASE_DATASETS={}) {
         // 依赖的全局变量声明，如果 BASE_DATASETS 非字符串形式，可调用 JSON.stringify 等方法进行处理，保证变量的正常声明
         if(!BASE_DATASETS.domain){
-            // @ts-ignore
             BASE_DATASETS.domain=window.location.protocol+"//"+window.location.host
         }
         BASE_DATASETS=JSON.stringify(BASE_DATASETS)

@@ -1,5 +1,4 @@
 export function str2utf8(str) {
-    // @ts-ignore
     let encoder = new TextEncoder("utf8");
     return encoder.encode(str);
 }
