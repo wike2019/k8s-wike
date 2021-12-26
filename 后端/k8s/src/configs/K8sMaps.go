@@ -80,8 +80,8 @@ func(this *K8sMaps) InitRoleBindingMap() *Rbac.RoleBindingMapStruct{
 }
 
 //初始化RoleBindingMap
-func(this *K8sMaps) InitSaMap() *Sa.ServiceMapStruct{
-	return &Sa.ServiceMapStruct{}
+func(this *K8sMaps) InitSaMap() *Sa.MapStruct{
+	return &Sa.MapStruct{}
 }
 
 //初始化ClusterRole

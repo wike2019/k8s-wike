@@ -34,7 +34,7 @@ type K8sConfig struct {
 	NodeHandler *Node.NodeMapHandler `inject:"-"`
 	RoleHander *Rbac.RoleHander `inject:"-"`
 	RoleBindingHander *Rbac.RoleBindingHander `inject:"-"`
-	SaHander *Sa.ServiceHandler `inject:"-"`
+	SaHander *Sa.Handler `inject:"-"`
 	ClusterRoleHandler *Rbac.ClusterRoleHandler `inject:"-"`
 	ClusterRoleBindingHandler *Rbac.ClusterRoleBindingHander `inject:"-"`
 	PvcBindingHandler *Pvc.Handler `inject:"-"`

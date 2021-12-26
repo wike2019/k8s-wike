@@ -73,8 +73,8 @@ func(this *K8sHandler) ConfigRoleBindingHandler() *Rbac.RoleBindingHander{
 }
 
 // RoleBindingHandler
-func(this *K8sHandler) ConfigSaHandler() *Sa.ServiceHandler{
-	return &Sa.ServiceHandler{}
+func(this *K8sHandler) ConfigSaHandler() *Sa.Handler{
+	return &Sa.Handler{}
 }
 
 // ClusterRoleHandler
