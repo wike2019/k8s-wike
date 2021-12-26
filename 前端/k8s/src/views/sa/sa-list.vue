@@ -77,7 +77,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, reactive, ref, toRefs} from 'vue'
+import {defineComponent, inject, onMounted, reactive, ref, toRefs} from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import MainLayout from "../../layout/main.vue";
 import {getNsList} from "../../api/token/namespace/ns";
@@ -221,6 +221,7 @@ export default defineComponent({
       state.current_page=page
       changeNs()
     }
+
     return {...toRefs(state),rm,changeNs,doTo,showToken,post,rules,formRef,pageChange}
   }
 })

@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, nextTick, reactive, ref, toRefs, watch} from 'vue'
+import {defineComponent, inject, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
 import {ElMessageBox, ElMessage, ElLoading} from 'element-plus'
 import MainLayout from "../../layout/main.vue";
 import {getNsList} from "../../api/token/namespace/ns";
@@ -249,6 +249,7 @@ export default defineComponent({
                   })
           })
     }
+
     return {...toRefs(state),doTo,Update,yamlRef,mateDataRef,yamlChange,getData,formRef,requireRules,addSecrets,addImagePullSecrets,removeSecretItems,post}
   }
 })
