@@ -16,9 +16,12 @@ type Ctl struct{
 func NewNsCtl() *Ctl {
   return &Ctl{}
 }
-func(this *Ctl) getList(c *gin.Context) goft.Json{
+//获取全部 不带分页
+func(this *Ctl) listAll(c *gin.Context) goft.Json{
 	return gin.H{"code":200, "data":this.Map.ListAll()} //获取列表
 }
+
+//删除
 func(this *Ctl) delete(c *gin.Context) goft.Json{
 	name:=c.DefaultQuery("name","")
 
@@ -29,6 +32,7 @@ func(this *Ctl) delete(c *gin.Context) goft.Json{
 	goft.Error(err)
 	return gin.H{"code":200, "data":"删除成功"}
 }
+//添加
 func(this *Ctl) create(c *gin.Context) goft.Json{
 	obj:=&CreateModel{}
 	err:=c.ShouldBindJSON(obj)
@@ -44,8 +48,10 @@ func(this *Ctl) create(c *gin.Context) goft.Json{
 	goft.Error(err)
 	return gin.H{"code":200, "data":"创建成功"}
 }
+
+//路由
 func(this *Ctl)  Build(goft *goft.Goft){
-	goft.Handle("GET","/ns",this.getList)
+	goft.Handle("GET","/ns",this.listAll)
 	goft.Handle("POST","/ns",this.create)
 	goft.Handle("DELETE","/ns",this.delete)
 }

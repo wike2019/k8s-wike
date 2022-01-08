@@ -41,7 +41,7 @@ import {createNs, deleteNs, getNsList} from "../../api/token/namespace/ns";
 import {requireRules} from "../../helper/rules";
 import {ingressCreate} from "../../api/token/ingress";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {configmapDel} from "../../api/token/configmap";
+import {configmapDel} from "../../api/token/configmap/configmap";
 export default defineComponent({
   name: 'namespace',
   components: {MainLayout},

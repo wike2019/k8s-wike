@@ -75,7 +75,7 @@ import MainLayout from "../../layout/main.vue";
 import {getNsList} from "../../api/token/namespace/ns";
 import {doTo} from "../../router";
 import {getSaItem, getSaList, SACreate, SaDel, SAUpdate} from "../../api/token/sa/sa";
-import {secretAllByNs, secretDetail} from "../../api/token/secret";
+import {secretAllByNs, secretDetail} from "../../api/token/secret/secret";
 import {roleCreate} from "../../api/token/rbac";
 import {useRoute} from "vue-router";
 import yaml from "../../components/Ymal/yaml.vue";
@@ -84,7 +84,7 @@ import {requireRules,inArrayWithMsg} from "../../helper/rules.ts"
 import md5 from 'js-md5';
 import {getData} from "../../helper/helper.ts"
 import {pvcAllByNs} from "../../api/token/pvc";
-import {configmapAllByNs} from "../../api/token/configmap";
+import {configmapAllByNs} from "../../api/token/configmap/configmap";
 export default defineComponent({
   name: 'sa-detail',
   components: {MainLayout,yaml,mateData},
@@ -92,7 +92,7 @@ export default defineComponent({
     let state=reactive({
       item:{},
       name:"",
-      name_space:"",
+      namespace:"",
       mode:"json",
       form:{
         apiVersion:'v1',
@@ -112,19 +112,22 @@ export default defineComponent({
     })
     const route = useRoute()
     let loading
-    state.name=route.query.name
-    state.name_space=route.query.name_space
+
     let yamlRef=ref(null)
     let mateDataRef=ref(null)
     const formRef=ref(null)
     async function getDataItem(){
       try {
-       let tData=await getSaItem(state.name_space,state.name)
+       let tData=await getSaItem(route.query.namespace,route.query.name)
         state.item=tData.data.data
         state.form.metadata.name=state.item.name
-        state.form.metadata.namespace=state.item.name_space
+        state.form.metadata.namespace=state.item.namespace
         state.form.secrets=tData.data.data.secrets||[]
         state.form.imagePullSecrets=tData.data.data.imagePullSecrets||[]
+        state.name=state.item.name
+        state.namespace=state.item.namespace
+        state.form.metadata.labels=tData.data.data.labels
+        state.form.metadata.annotations=tData.data.data.annotations
       }catch (e){
         console.log(e)
       }
@@ -146,8 +149,8 @@ export default defineComponent({
             state.form.Kind=state.Kind
             showErr( 'apiVersion和Kind不允许修改',state.mode)
           }
-          if(data.metadata.namespace!==state.name_space|| data.metadata.name!=state.name){
-            state.form.metadata.namespace=state.name_space
+          if(data.metadata.namespace!==state.namespace|| data.metadata.name!=state.name){
+            state.form.metadata.namespace=state.namespace
             state.form.metadata.name=state.name
             showErr( 'name和namespace不允许修改',state.mode)
           }

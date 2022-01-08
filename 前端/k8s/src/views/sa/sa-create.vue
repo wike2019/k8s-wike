@@ -75,7 +75,7 @@ import MainLayout from "../../layout/main.vue";
 import {getNsList} from "../../api/token/namespace/ns";
 import {doTo} from "../../router";
 import {getSaItem, getSaList, SACreate, SaDel, SAUpdate} from "../../api/token/sa/sa";
-import {secretAllByNs, secretDetail} from "../../api/token/secret";
+import {secretAllByNs, secretDetail} from "../../api/token/secret/secret";
 import {roleCreate} from "../../api/token/rbac";
 import {useRoute} from "vue-router";
 import yaml from "../../components/Ymal/yaml.vue";
@@ -84,7 +84,7 @@ import {requireRules,inArrayWithMsg} from "../../helper/rules.ts"
 import md5 from 'js-md5';
 import {getData} from "../../helper/helper.ts"
 import {pvcAllByNs} from "../../api/token/pvc";
-import {configmapAllByNs} from "../../api/token/configmap";
+import {configmapAllByNs} from "../../api/token/configmap/configmap";
 export default defineComponent({
   name: 'sa-detail',
   components: {MainLayout,yaml,mateData},
@@ -92,7 +92,7 @@ export default defineComponent({
     let state=reactive({
       item:{},
       name:"",
-      name_space:"",
+      namespace:"",
       mode:"json",
       form:{
         apiVersion:'v1',
@@ -110,10 +110,7 @@ export default defineComponent({
       apiVersion:'v1',
       Kind:'ServiceAccount',
     })
-    const route = useRoute()
     let loading
-    state.name=route.query.name
-    state.name_space=route.query.name_space
     let yamlRef=ref(null)
     let mateDataRef=ref(null)
     const formRef=ref(null)

@@ -8,12 +8,12 @@
      <div class="top-list">
                  <div class="name_space_choose">
                    <span>命名空间:</span>
-                   <el-select placeholder="选择命名空间" @change="changeNs" filterable v-model="name_space">
+                   <el-select placeholder="选择命名空间" @change="changeNs" filterable v-model="namespace">
                      <el-option v-for="ns in nsList "
                                 :label="ns.name"
                                 :value="ns.name"/>
                    </el-select>
-                   <el-button style="margin-left:40px" @click="doTo('sa-create')">创建SA</el-button>
+                   <el-button style="margin-left:40px" type="primary" @click="doTo('sa-create')">创建SA</el-button>
                  </div>
                   <el-divider></el-divider>
                   <el-table
@@ -29,7 +29,7 @@
                </el-table-column>
                <el-table-column label="命名空间" width="180" align="center">
                  <template #default="scope">
-                   <span>{{ scope.row.name_space }}</span>
+                   <span>{{ scope.row.namespace }}</span>
                  </template>
                </el-table-column>
                <el-table-column label="创建时间" width="200" align="center">
@@ -42,10 +42,10 @@
                      <el-button
                          type="info"
                          size="small"
-                         @click="()=>doTo('sa-detail',{name_space:scope.row.name_space,name:scope.row.name})"  >
+                         @click="()=>doTo('sa-detail',{namespace:scope.row.namespace,name:scope.row.name})"  >
                        查看详情
                      </el-button>
-                     <el-button type="danger" size="small" @click="()=>rm(scope.row.name_space,scope.row.name )" >删除</el-button>
+                     <el-button type="danger" size="small" @click="()=>rm(scope.row.namespace,scope.row.name )" >删除</el-button>
                  </template>
                </el-table-column>
     </el-table>
@@ -83,7 +83,7 @@ import MainLayout from "../../layout/main.vue";
 import {getNsList} from "../../api/token/namespace/ns";
 import {doTo} from "../../router";
 import {getSaList, SACreate, SaDel} from "../../api/token/sa/sa";
-import {secretDetail} from "../../api/token/secret";
+import {secretDetail} from "../../api/token/secret/secret";
 import {roleCreate} from "../../api/token/rbac";
 
 export default defineComponent({
@@ -94,14 +94,14 @@ export default defineComponent({
     let state=reactive({
       nsList:reactive([]),
       List:reactive([]),
-      name_space:"default",
+      namespace:"default",
       dialogVisible:false,
       token:'',
       pageInfo:0,
       current_page:1,
       form:reactive({
         name:"",
-        name_space:"",
+        namespace:"",
       }),
     })
     let formRef=ref(null)
@@ -116,7 +116,7 @@ export default defineComponent({
     }
     async function changeNs(){
       try {
-          let tData=await getSaList(state.name_space,state.current_page)
+          let tData=await getSaList(state.namespace,state.current_page)
 
            let T=tData.data.data
             state.List=T.Data
@@ -133,7 +133,7 @@ export default defineComponent({
         let tData=JSON.parse(e.data)
         let T=tData.result;
         console.log(T)
-        if(tData.type=='sa'&&tData.ns==state.name_space){
+        if(tData.type=='sa'&&tData.ns==state.namespace){
           state.List=T.Data
           state.pageInfo=T.Total
           state.current_page=T.Current

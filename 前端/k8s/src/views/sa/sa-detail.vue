@@ -10,7 +10,7 @@
          账号服务名称: {{item.name}}
        </p>
        <p>
-         命名空间: {{item.name_space}}
+         命名空间: {{item.namespace}}
        </p>
        <p>
        创建时间: {{item.create_time}}
@@ -38,7 +38,7 @@
        <h3>密文列表</h3>
        <div v-if="item.secrets&&item.secrets.length">
           <p v-for="secret in item.secrets">
-            密文名称: <a  @click="()=>doTo('secret-detail',{name_space:item.name_space,name:secret.name})">{{secret.name}} 查看密文</a>
+            密文名称: <a  @click="()=>doTo('secret-detail',{namespace:item.namespace,name:secret.name})">{{secret.name}} 查看密文</a>
           </p>
        </div>
        <div v-else>
@@ -48,7 +48,7 @@
        <h3>拉取镜像列表</h3>
        <div v-if="item.imagePullSecrets&&item.imagePullSecrets.length">
          <p v-for="imagePullSecret in item.imagePullSecrets">
-           镜像密文名称:<a  @click="()=>doTo('secret-detail',{name_space:item.name_space,name:imagePullSecret.name})">{{imagePullSecret.name}} 查看密文</a>
+           镜像密文名称:<a  @click="()=>doTo('secret-detail',{namespace:item.namespace,name:imagePullSecret.name})">{{imagePullSecret.name}} 查看密文</a>
          </p>
        </div>
        <div v-else>
@@ -56,7 +56,7 @@
        </div>
      </div>
      <el-divider></el-divider>
-     <el-button type="primary" @click="()=>doTo('sa-update',{name_space:name_space,name:name})" >
+     <el-button type="primary" @click="()=>doTo('sa-update',{namespace:namespace,name:name})" >
        编辑
      </el-button>
    </main-layout>
@@ -69,7 +69,7 @@ import MainLayout from "../../layout/main.vue";
 import {getNsList} from "../../api/token/namespace/ns";
 import {doTo} from "../../router";
 import {getSaItem, getSaList, SACreate, SaDel} from "../../api/token/sa/sa";
-import {secretDetail} from "../../api/token/secret";
+import {secretDetail} from "../../api/token/secret/secret";
 import {roleCreate} from "../../api/token/rbac";
 import {useRoute} from "vue-router";
 
@@ -80,14 +80,14 @@ export default defineComponent({
     let state=reactive({
       item:{},
       name:"",
-      name_space:""
+      namespace:""
     })
     const route = useRoute()
     state.name=route.query.name
-    state.name_space=route.query.name_space
+    state.namespace=route.query.namespace
     async function getData(){
       try {
-       let tData=await getSaItem(state.name_space,state.name)
+       let tData=await getSaItem(state.namespace,state.name)
         state.item=tData.data.data
       }catch (e){
         console.log(e)
@@ -97,7 +97,7 @@ export default defineComponent({
 
     async function showToken(name){
       try {
-      let result=await secretDetail(state.name_space,name)
+      let result=await secretDetail(state.namespace,name)
       let token=window.atob(result.data.data.data['token'])
       state.token=token;
       state.dialogVisible=true;

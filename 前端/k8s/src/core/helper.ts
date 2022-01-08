@@ -57,6 +57,9 @@ export    function isInArr(arr,msg){
 export   function parseData(str){
     //类似 echo -c 'echo The app is running! && sleep 3600'
     //单引号和双引号 里面的内容 不做 split
+    if(str==""){
+        return []
+    }
     str=str.replace(/^\s+|\s+$/gm,'')  //实现trim
     let pattern =/[\"|'](.*?)[\"|']/gi;
     let mList=str.match(pattern)
@@ -78,5 +81,6 @@ export   function parseData(str){
             ret[index]=ret[index].replace(/^[\"|']|[\"|']$/gm,'')
         }
     })
+    console.log(ret,"^^^^^^^^")
     return ret
 }
