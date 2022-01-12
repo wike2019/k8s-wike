@@ -1,0 +1,209 @@
+.quick-links {
+    text-align: center;
+    background-color: #f8f8f9;
+    overflow: hidden;
+    padding: 30px 15px;
+}
+.ad {
+    text-align: center;
+    font-size: 18px;
+    display: block;
+    line-height:2;
+    margin-bottom:30px;
+}
+.ad strong {
+    line-height:2.5;
+    font-size: 1.8em;
+}
+.ui-btn {
+    display: inline-block;
+    border: 1px solid #bbbec4;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1.42857;
+    text-align: center;
+    padding: 5px 12px;
+    text-decoration: none;
+    white-space: nowrap;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    outline: none;
+    border-radius:4px;
+}
+.ui-btn-success {
+    color: #fff;
+    background-color: #15bd9a;
+    border: 1px solid #15bd9a;
+}
+.ui-btn-lg {
+    padding: 7px 16px;
+    font-size: 18px;
+    border-radius: 6px;
+}
+.quick-links a {
+    margin-left: 30px;
+    margin-right: 30px;
+    font-size: 24px;
+    min-width: 160px;
+
+}
+
+.ui-btn-dark {
+    color: #fff;
+    background-color: #313644;
+    border: 1px solid #313644;
+}
+.advantage {
+    border-top: 1px solid #e9eaec;
+    border-bottom: 1px solid #e9eaec;
+    padding-bottom: 120px;
+}
+.ui-container {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.ui-container {
+    width: 1200px;
+}
+.ui-row {
+    margin: 30px -15px;
+}
+.ui-row:after, .ui-row:before {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.advantage .ui-col-sm-8 {
+    min-height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+
+.advantage .ui-col-sm-8 .icon {
+    font-size: 40px;
+    width: 60px;
+    vertical-align: middle;
+}
+.advantage .ui-col-sm-8 .icon {
+    font-size: 40px;
+    width: 60px;
+    vertical-align: middle;
+}
+.advantage .ui-col-sm-8 .desc {
+    padding-right: 20px;
+    flex: 1;
+}
+.advantage .ui-col-sm-8 h4 {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+.advantage .ui-col-sm-8 p {
+    margin: 0;
+    line-height: 1.2;
+}
+.container{
+    min-width:1200px;
+    margin: auto 20px;
+}
+
+
+.container .title {
+    font-weight: 700;
+    color: #fff;
+    font-size: 40px;
+    line-height: 2;
+}
+.container .title span{
+    font-size: 14px;
+    vertical-align: middle;
+}
+.container nav {
+    float: right;
+    margin-right: 50px;
+    margin-top: 35px;
+
+}
+.container nav a {
+    margin-left: 30px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    position: relative;
+}
+.bg {
+    width: 1920px;
+    position: fixed;
+    left: 50%;
+    margin-left: -960px;
+    top: 0;
+    z-index: -1;
+    vertical-align: top;
+}
+
+#app{background:#1e1e1e}
+.otherinfo{background:#ffffff;margin-top:30px;overflow: hidden}
+.advantage h3{
+    text-align: center;
+    font-size: 44px;;margin-top:20px
+}
+
+.advantage .ui-col-sm-8{
+    min-height: 120px;
+    display: flex;
+}
+.ui-col-sm-8 {
+    width: 33.33333%;
+    float: left;
+}
+.me{margin:20px;font-size:20px;font-weight: bold}
+.desc{margin:20px;font-size:16px}
+.ourSerive{margin:20px;line-height:2;font-size:16px}
+.project_item, .collect_item {
+    margin: 20px;
+    border-bottom: 1px dashed #eee;
+    padding: 20px 5px;
+    color: #111;
+    cursor: pointer;
+}
+.project_item, .collect_item {
+    margin: 20px;
+    border-bottom: 1px dashed #eee;
+    padding: 20px 5px;
+    color: #111;
+    cursor: pointer;
+}
+.project_item p {
+    line-height: 1.6;
+    margin: 20px 5px 10px 5px;
+}
+.address_info {
+    color: #333;
+    display: block;
+    font-weight: bold;
+    margin-left: 5px;
+}
+.project_item h3 span, .main_detail h3 span {
+    background: #ddd;
+    padding: 2px 10px;
+    margin: 0 6px;
+    font-size: 12px;
+    border-radius: 5px;
+}
+.project_item h3 span:first-child, .main_detail h3 span:first-child {
+    margin-left: 15px;
+}
+.project_item p {
+    line-height: 1.6;
+    margin: 20px 5px 10px 5px;
+}
+
+.container {margin-top:0px!important;}
