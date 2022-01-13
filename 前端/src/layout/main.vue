@@ -1,6 +1,6 @@
 <template>
     <main class="flex">
-      <Aside />
+      <commonNav />
       <div class="main_detail_content">
         <slot></slot>
       </div>
@@ -9,9 +9,9 @@
 
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
-import Aside from "../components/common/aside.vue";
+import commonNav from "@/components/common/commonNav.vue";
 export default defineComponent({
   name: 'main-layout',
-  components: {Aside},
+  components: {commonNav},
 })
 </script>

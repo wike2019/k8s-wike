@@ -8,21 +8,21 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 //@Service
 //@service
 type Service struct {
 	Client *kubernetes.Clientset `inject:"-"`
-	Map *MapStruct `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	Map *MapStruct               `inject:"-"`
+	Helper *helper.Helper        `inject:"-"` //帮助函数 用于分页
 }
 func NewSecretService() *Service {
 	return &Service{}
 }
 
 //对外方法，根据分页取dep列表
-func(this *Service) PageDeps(ns string,page,size int ) *Common.ItemsPage{
+func(this *Service) PageDeps(ns string,page,size int ) *helper.ItemsPage {
 	SecretList:=this.Map.ListAll(ns)
 	SecretCovert:=make([]interface{},len(SecretList))
 	for i,dep:=range SecretList{

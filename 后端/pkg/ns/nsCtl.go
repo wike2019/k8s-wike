@@ -1,4 +1,4 @@
-package Ns
+package ns
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ func NewNsCtl() *Ctl {
 }
 //获取全部 不带分页
 func(this *Ctl) listAll(c *gin.Context) goft.Json{
-	return gin.H{"code":200, "data":this.Map.ListAll()} //获取列表
+	return gin.H{"code":200, "data":this.Map.ListAll()}
 }
 
 //删除

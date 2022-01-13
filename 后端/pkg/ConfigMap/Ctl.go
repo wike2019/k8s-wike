@@ -6,15 +6,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 
 //@restcontroller
 type ConfigMapCtl struct {
 	ConfigService *ConfigMapService `inject:"-"`
-	Client *kubernetes.Clientset  `inject:"-"`
-	Helper *Common.Helper `inject:"-"`
+	Client *kubernetes.Clientset    `inject:"-"`
+	Helper *helper.Helper           `inject:"-"`
 }
 func NewConfigMapCtl() *ConfigMapCtl{
 	return &ConfigMapCtl{}

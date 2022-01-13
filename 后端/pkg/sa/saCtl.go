@@ -1,4 +1,4 @@
-package Sa
+package sa
 
 import (
 	"fmt"
@@ -7,12 +7,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 type SaCtl struct{
-	MapStruct *MapStruct `inject:"-"`
-	Helper *Common.Helper `inject:"-"`
+	MapStruct *MapStruct         `inject:"-"`
+	Helper *helper.Helper        `inject:"-"`
 	Client *kubernetes.Clientset `inject:"-"`
 }
 func NewSaCtl() *SaCtl{
@@ -28,7 +28,7 @@ func(this *SaCtl) listAll(c *gin.Context) goft.Json{
 }
 
 //列表带分页
-func(this *SaCtl) list(c *gin.Context) goft.Json{
+func(this *SaCtl) listPage(c *gin.Context) goft.Json{
 	ns:=c.DefaultQuery("ns","default")
 	page:=c.DefaultQuery("page","1")
 	return gin.H{
@@ -63,8 +63,7 @@ func(this *SaCtl) del(c *gin.Context) goft.Json{
 }
 //创建
 func(this *SaCtl) create(c *gin.Context) goft.Json{
-	ServiceAccount:=&corev1.ServiceAccount{} //原生的k8s role 对象
-	ServiceAccount.APIVersion="v1"
+	ServiceAccount:=&corev1.ServiceAccount{} //原生的k8s ServiceAccount 对象
 	goft.Error(c.ShouldBindJSON(ServiceAccount))
 	_,err:=this.Client.CoreV1().ServiceAccounts(ServiceAccount.Namespace).Create(c,ServiceAccount,metav1.CreateOptions{})
 	goft.Error(err)
@@ -75,8 +74,7 @@ func(this *SaCtl) create(c *gin.Context) goft.Json{
 }
 //更新
 func(this *SaCtl) update(c *gin.Context) goft.Json{
-	ServiceAccount:=&corev1.ServiceAccount{} //原生的k8s role 对象
-	ServiceAccount.APIVersion="v1"
+	ServiceAccount:=&corev1.ServiceAccount{} //原生的k8s ServiceAccount 对象
 	goft.Error(c.ShouldBindJSON(ServiceAccount))
 	fmt.Println(ServiceAccount)
 	_,err:=this.Client.CoreV1().ServiceAccounts(ServiceAccount.Namespace).Update(c,ServiceAccount,metav1.UpdateOptions{})
@@ -88,11 +86,11 @@ func(this *SaCtl) update(c *gin.Context) goft.Json{
 }
 func(this *SaCtl)  Build(goft *goft.Goft){
 	goft.Handle("GET","/sa",this.listAll)
-	goft.Handle("GET","/sa/page",this.list)
+	goft.Handle("GET","/sa/page",this.listPage)
 	goft.Handle("DELETE","/sa",this.del)
 	goft.Handle("POST","/sa",this.create)
 	goft.Handle("GET","/sa/item",this.getItem)
-	goft.Handle("POST","/sa/update",this.update)
+	goft.Handle("PUT","/sa",this.update)
 }
 func(*SaCtl)  Name() string{
 	return "SaCtl"

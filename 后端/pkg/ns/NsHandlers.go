@@ -1,4 +1,4 @@
-package Ns
+package ns
 
 import (
 	corev1 "k8s.io/api/core/v1"
@@ -12,7 +12,7 @@ type Handler struct {
 func(this *Handler) OnAdd(obj interface{}){
 	this.Map.Add(obj.(*corev1.Namespace))
 	ret:=map[string]interface{}{"result":this.Map.ListAll(),"type":"namespace"}
-	wscore.ClientMap.SendAll(ret)
+	wscore.ClientMap.SendAll(ret) //像ws发送数据
 }
 func(this *Handler) OnUpdate(oldObj, newObj interface{}){
 	this.Map.Update(newObj.(*corev1.Namespace))

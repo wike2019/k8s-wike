@@ -14,7 +14,7 @@ import jsyaml  from "js-yaml"
 import {core} from "../../core/core.ts"
 import md5 from 'js-md5';
 import {ElMessage} from "element-plus";
-import {autoComplete} from "../../api/other";
+import {getAutoComplete} from "../../api/token/common/common";
 export default defineComponent({
   name: 'yaml',
   props: {
@@ -47,7 +47,7 @@ export default defineComponent({
       editor.completers.push({
         getCompletions: async  function(editor, session, pos, prefix, callback) {
           console.log(prefix)
-          let data=await autoComplete()
+          let data=await getAutoComplete()
           console.log(data.data)
           if (prefix.length === 0) {
             return callback(null, []);

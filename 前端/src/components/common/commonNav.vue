@@ -8,10 +8,13 @@
           <span>全局资源</span>
         </template>
         <el-menu-item-group title="命名空间">
-          <el-menu-item index="1-1"  @click="doTo('namespace')"><i class="fa fa-bandcamp" aria-hidden="true"></i><span>命名空间</span></el-menu-item>
+          <el-menu-item index="1-1"  @click="doTo('ns-list')">
+            <i class="fa fa-bandcamp" aria-hidden="true"></i>
+            <span>命名空间</span>
+          </el-menu-item>
         </el-menu-item-group>
         <el-menu-item-group title="Pod管理">
-          <el-menu-item index="1-2"  @click="doTo('pod')"><i class="fa fa-id-card-o" aria-hidden="true"></i><span>Pod资源</span></el-menu-item>
+          <el-menu-item index="1-2"  @click="doTo('pod')"><i class="fa fa-id-card-o" aria-hidden="true"></i><span>Pod列表</span></el-menu-item>
         </el-menu-item-group>
         <el-menu-item-group title="节点管理">
           <el-menu-item index="1-3"  @click="doTo('node-list')"><i class="fa fa-etsy" aria-hidden="true"></i><span>节点列表</span></el-menu-item>
@@ -136,16 +139,9 @@
 import { ref, defineComponent } from 'vue'
 import {doTo} from '../../router';
 export default defineComponent({
-  name: 'aside',
-  props: {
-    msg: {
-      type: String,
-      required: true
-    }
-  },
+  name: 'commonNav',
   setup: () => {
-    const count = ref(0)
-    return { count,doTo }
+    return { doTo }
   }
 })
 </script>

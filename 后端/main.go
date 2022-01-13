@@ -4,21 +4,21 @@ import (
 	"embed"
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
+	"k8sapi/pkg/common"
 	"k8sapi/pkg/ConfigMap"
 	"k8sapi/pkg/Deployment"
 	"k8sapi/pkg/Ingress"
 	"k8sapi/pkg/Node"
-	"k8sapi/pkg/Ns"
 	"k8sapi/pkg/Pod"
 	"k8sapi/pkg/Pvc"
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Resources"
-	"k8sapi/pkg/Sa"
+	"k8sapi/pkg/sa"
 	"k8sapi/pkg/Secret"
 	"k8sapi/pkg/Svc"
 	"k8sapi/pkg/User"
 	"k8sapi/pkg/Ws"
-	Other "k8sapi/pkg/other"
+	"k8sapi/pkg/ns"
 	"k8sapi/src/configs"
 	"net/http"
 )
@@ -91,7 +91,7 @@ func main() {
 			Deployment.NewDeploymentCtl(),
 			Pod.NewPodCtl(),
 			Ws.NewWsCtl(),
-			Ns.NewNsCtl(),
+			ns.NewNsCtl(),
 			User.NewUserCtl(),
 			Ingress.NewIngressCtl(),
 			Svc.NewSvcCtl(),
@@ -100,18 +100,18 @@ func main() {
 			Node.NewNodeCtl(),
 			Rbac.NewRBACCtl(),
 			Resources.NewResourcesCtl(),
-			Sa.NewSaCtl(),
+			sa.NewSaCtl(),
 			Pvc.NewSaCtl(),
-			Other.NewOtherCtl(),
+			common.NewOtherCtl(),
 		)
 	web.Engine.GET("/", func(c *gin.Context) {
 		c.FileFromFS("/html/"+c.Param("filepath"),http.FS(dist))
 	})
 	for _,v :=range removeDuplicateElement(keywords){
-		Other.AddSySAutoComplete(v)
+		common.AddSySAutoComplete(v)
 	}
 	for _,v :=range removeDuplicateElement(keywordsValue){
-		Other.AddValueAutoComplete(v)
+		common.AddValueAutoComplete(v)
 	}
 	web.Launch()
 

@@ -1,3 +1,4 @@
+import {ElMessageBox} from "element-plus";
 
 export  function getData(data,keys,obj){
     let arr=keys.split('.')
@@ -106,4 +107,33 @@ export function MapToArr(input){
         arr.push({key:i,value:input[i],NoRequired:!!input[i]})
     }
     return arr;
+}
+export function  rowToQuery(row){
+    return {namespace:row.namespace,name:row.name}
+}
+
+export function copyData(state,tData){
+    let T=tData.data.data
+    state.List=T.Data
+    state.pageInfo=T.Total
+    state.current_page=T.Current
+}
+export function wsCopyData(state,tData,type){
+    let T=tData.result;
+    if(tData.type==type&&tData.ns==state.namespace){
+        state.List=T.Data
+        state.pageInfo=T.Total
+        state.current_page=T.Current
+    }
+}
+export  function rmTip(name){
+    return ElMessageBox.confirm(
+        '你确定继续删除这个'+name+'账户操作吗?',
+        'Warning',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
 }

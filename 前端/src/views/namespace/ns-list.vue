@@ -1,10 +1,6 @@
 <template>
    <main-layout>
-     <nav class="nav-bar">
-          <el-breadcrumb separator="/">
-             <el-breadcrumb-item>命名空间列表</el-breadcrumb-item>
-          </el-breadcrumb>
-     </nav>
+     <breadcrumb title="命名空间.列表"></breadcrumb>
      <el-button type="primary" class="right mtb20" @click="dialogFormVisible=true" >创建命名空间</el-button>
      <el-divider class="clear_both"></el-divider>
      <div class="top-list">
@@ -41,35 +37,36 @@
 
 <script lang="ts">
 import {defineComponent,computed ,ref,onUnmounted, inject,reactive,toRefs } from 'vue'
-import MainLayout from "../../layout/main.vue";
-import {createNs, deleteNs, getNsList} from "../../api/token/namespace/ns";
+import MainLayout from "@/layout/main.vue";
+import {createNs, deleteNs, getNsList} from "@/api/token/namespace/ns";
 import {requireRules} from "../../helper/rules";
-import {ingressCreate} from "../../api/token/ingress/ingress";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {configmapDel} from "../../api/token/configmap/configmap";
+import breadcrumb from  "@/components/common/breadcrumb.vue"
 export default defineComponent({
   name: 'namespace',
-  components: {MainLayout},
+  components: {
+    MainLayout,
+    breadcrumb
+  },
   setup(){
-
-    const ws = inject("ws")
+    const ws = inject("ws") //通信用的
     let state=reactive({
-      nsList:reactive([]),
-      dialogFormVisible:false,
+      nsList:[],//ns数据
+      dialogFormVisible:false, //弹窗
       form:{
-        name:""
+        name:""  //表单
       }
     })
-    const formRef=ref(null)
-    async function getData(){
+    const formRef=ref(null) //refs引用
+    async function fetchData(){
       try {
-       let tData=await getNsList()
+       let tData=await getNsList()  //获取数据
         state.nsList=tData.data.data
       }catch (e){
         console.log(e)
       }
     }
-    getData()
+    fetchData()
 
 
     ws.onmessage = (e)=>{
@@ -81,18 +78,17 @@ export default defineComponent({
       }
     }
     function create(){
-      formRef.value.validate(async (valid) => {
+      formRef.value.validate(async (valid) => { //验证数据
         if(valid){
           try {
-            let result= await  createNs({name:state.form.name})
+            let result= await  createNs({name:state.form.name})  //提交数据
             if (result.data.code==200){
               ElMessage("资源创建成功")
               state.form.name=""
               state.dialogFormVisible=false
             }
-
           }catch (e){
-            ElMessage.error("资源格式有误:"+e)
+
           }
         }
       })
@@ -115,7 +111,6 @@ export default defineComponent({
               }
               await deleteNs(name)
             }catch (e) {
-              ElMessage.error('系统异常:'+e)
             }
           })
     }

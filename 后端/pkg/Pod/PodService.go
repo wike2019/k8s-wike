@@ -3,18 +3,18 @@ package Pod
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"k8sapi/pkg/Common"
 	"k8sapi/pkg/Event"
 	"k8sapi/pkg/Rs"
+	"k8sapi/pkg/helper"
 )
 
 //@Service
 type PodService struct {
-	PodMap *PodMapStruct `inject:"-"` //pod对象存储集合
-	Common *CommonService `inject:"-"`//公共服务 例如镜像，状态等处理
+	PodMap *PodMapStruct           `inject:"-"` //pod对象存储集合
+	Common *CommonService          `inject:"-"` //公共服务 例如镜像，状态等处理
 	EventMap *Event.EventMapStruct `inject:"-"` //事件对象存储集合
-	RsMapStruct *Rs.MapStruct `inject:"-"` //rs对象
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	RsMapStruct *Rs.MapStruct      `inject:"-"` //rs对象
+	Helper *helper.Helper          `inject:"-"` //帮助函数 用于分页
 }
 
 func NewPodService() *PodService {
@@ -41,7 +41,7 @@ func(this *PodService) listByNs(ns string) []*Pod{
 	return  ret
 }
 //对外方法，根据分页取pod
-func(this *PodService) PagePods(ns string,page,size int ) *Common.ItemsPage{
+func(this *PodService) PagePods(ns string,page,size int ) *helper.ItemsPage {
 	pods:=this.listByNs(ns)
 	readyCount:=0 //就绪的pod数量
 	allCount:=0 //总数量

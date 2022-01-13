@@ -11,18 +11,18 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 	"k8sapi/src/wscore"
 	"os"
 	"time"
 )
 
 type PodCtl struct {
-	PodService *PodService `inject:"-"`
-	Helper *Common.Helper `inject:"-"`
+	PodService *PodService       `inject:"-"`
+	Helper *helper.Helper        `inject:"-"`
 	Client *kubernetes.Clientset `inject:"-"`
-	Config *rest.Config `inject:"-"`
-	podHelper *Helper `inject:"-"`
+	Config *rest.Config          `inject:"-"`
+	podHelper *Helper            `inject:"-"`
 }
 
 func NewPodCtl() *PodCtl {

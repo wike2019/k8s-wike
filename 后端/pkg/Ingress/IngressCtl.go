@@ -6,13 +6,13 @@ import (
 	netv1 "k8s.io/api/networking/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 type IngressCtl struct{
 	IngressService *IngressService `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
-	Client *kubernetes.Clientset  `inject:"-"`
+	Helper *helper.Helper          `inject:"-"` //帮助函数 用于分页
+	Client *kubernetes.Clientset   `inject:"-"`
 }
 func NewIngressCtl() *IngressCtl{
   return &IngressCtl{}

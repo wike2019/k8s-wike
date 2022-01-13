@@ -14,34 +14,34 @@ import (
 	"k8sapi/pkg/Event"
 	"k8sapi/pkg/Ingress"
 	"k8sapi/pkg/Node"
-	"k8sapi/pkg/Ns"
+	"k8sapi/pkg/ns"
 	"k8sapi/pkg/Pod"
 	"k8sapi/pkg/Pvc"
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Rs"
-	"k8sapi/pkg/Sa"
+	"k8sapi/pkg/sa"
 	"k8sapi/pkg/Secret"
 	"k8sapi/pkg/Svc"
 	"log"
 )
 
 type K8sConfig struct {
-	DepHandler *Deployment.DepHandler `inject:"-"`
-	PodHandler *Pod.PodHandler `inject:"-"`
-	NsHandler *Ns.Handler `inject:"-"`
-	EventHandler *Event.EventHandler `inject:"-"`
-	IngressHandler *Ingress.IngressHandler `inject:"-"`
-	ServiceHandler *Svc.ServiceHandler `inject:"-"`
-	SecretHandler *Secret.Handler `inject:"-"`
-	ConfigMapHandler *ConfigMap.ConfigMapHandler `inject:"-"`
-	NodeHandler *Node.NodeMapHandler `inject:"-"`
-	RoleHander *Rbac.RoleHander `inject:"-"`
-	RoleBindingHander *Rbac.RoleBindingHander `inject:"-"`
-	SaHander *Sa.Handler `inject:"-"`
-	ClusterRoleHandler *Rbac.ClusterRoleHandler `inject:"-"`
+	DepHandler *Deployment.DepHandler            `inject:"-"`
+	PodHandler *Pod.PodHandler                               `inject:"-"`
+	NsHandler *ns.Handler                                    `inject:"-"`
+	EventHandler *Event.EventHandler                         `inject:"-"`
+	IngressHandler *Ingress.IngressHandler                   `inject:"-"`
+	ServiceHandler *Svc.ServiceHandler                       `inject:"-"`
+	SecretHandler *Secret.Handler                            `inject:"-"`
+	ConfigMapHandler *ConfigMap.ConfigMapHandler             `inject:"-"`
+	NodeHandler *Node.NodeMapHandler                         `inject:"-"`
+	RoleHander *Rbac.RoleHander                              `inject:"-"`
+	RoleBindingHander *Rbac.RoleBindingHander                `inject:"-"`
+	SaHander *sa.Handler                                     `inject:"-"`
+	ClusterRoleHandler *Rbac.ClusterRoleHandler              `inject:"-"`
 	ClusterRoleBindingHandler *Rbac.ClusterRoleBindingHander `inject:"-"`
-	PvcBindingHandler *Pvc.Handler `inject:"-"`
-	RsBindingHandler *Rs.Handler `inject:"-"`
+	PvcBindingHandler *Pvc.Handler                           `inject:"-"`
+	RsBindingHandler *Rs.Handler                             `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {

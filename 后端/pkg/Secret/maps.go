@@ -3,16 +3,16 @@ package Secret
 import (
 	"fmt"
 	corev1 "k8s.io/api/core/v1"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 	"sort"
 	"sync"
 )
 
 //SecretMap
 type MapStruct struct {
-	data sync.Map   // [ns string] []*v1.Secret
-	Helper *Common.Helper `inject:"-"`
-	SecretHelper *Helper `inject:"-"`
+	data sync.Map         // [ns string] []*v1.Secret
+	Helper *helper.Helper `inject:"-"`
+	SecretHelper *Helper  `inject:"-"`
 }
 func(this *MapStruct) Get(ns string,name string) *corev1.Secret{
 	if items,ok:=this.data.Load(ns);ok{

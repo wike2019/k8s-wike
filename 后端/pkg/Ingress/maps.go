@@ -3,7 +3,7 @@ package Ingress
 import (
 	"fmt"
 	netv1 "k8s.io/api/networking/v1"
-	Other "k8sapi/pkg/other"
+	"k8sapi/pkg/common"
 	"sort"
 	"sync"
 )
@@ -29,7 +29,7 @@ func(this *IngressMapStruct) Add(ingress *netv1.Ingress){
 	if list,ok:=this.data.Load(ingress.Namespace);ok{
 		list=append(list.([]*netv1.Ingress),ingress)
 		this.data.Store(ingress.Namespace,list)
-		Other.AddAutoComplete(fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",ingress.Kind,ingress.Namespace,ingress.Name),ingress.Name,0)
+		common.AddAutoComplete(fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",ingress.Kind,ingress.Namespace,ingress.Name),ingress.Name,0)
 
 	}else{
 		this.data.Store(ingress.Namespace,[]*netv1.Ingress{ingress})
@@ -52,7 +52,7 @@ func(this *IngressMapStruct) Delete(ingress *netv1.Ingress){
 			if range_ingress.Name==ingress.Name{
 				newList:= append(list.([]*netv1.Ingress)[:i], list.([]*netv1.Ingress)[i+1:]...)
 				this.data.Store(ingress.Namespace,newList)
-				Other.DeleteAutoComplete(
+				common.DeleteAutoComplete(
 					fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",
 						range_ingress.Kind,range_ingress.Namespace,range_ingress.Name))
 				break

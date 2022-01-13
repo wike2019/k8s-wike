@@ -6,9 +6,9 @@
       type="info">
   </el-alert>
   <el-form :model="ruleForm" :rules="rules" ref="ruleFormRef" label-width="150px" >
-    <el-form-item label="用户邮箱"  prop="name" style="display: flex">
+    <el-form-item label="用户邮箱"  prop="email" style="display: flex">
       <div style="display:flex;">
-        <el-input v-model="ruleForm.name" style="margin-right:15px"></el-input>
+        <el-input v-model="ruleForm.email" style="margin-right:15px"></el-input>
         <el-button   @click="sendMsg">发送验证码</el-button>
       </div>
     </el-form-item>
@@ -27,9 +27,9 @@
 <script lang="ts">
 import {defineComponent ,reactive,ref,toRefs} from 'vue'
 import { ElMessage } from 'element-plus'
-import {Login, sendMail} from "../../api/user";
-import {doTo} from "../../router";
-import {core} from "../../core/core";
+import {Login, sendMail} from "@/api/user";
+import {doTo} from "@/router";
+import {core} from "@/core/core";
 export default defineComponent({
   name: 'view-login',
   components: {
@@ -38,76 +38,69 @@ export default defineComponent({
   setup(){
     let state=reactive({
       ruleForm:{
-        name:"test@ng2-oa.com",
+        email:"test@ng2-oa.com",
         code:"123456"
       },
-      rules:{
-        name:[
-          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
-        ],
-        code:[
-          { required: true, message: '请输入验证码', trigger: 'blur' },
-        ]
-      }
     })
-    const ruleFormRef=ref(null)
+    const rules={
+      email:[
+        { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+        { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+      ],
+      code:[
+        { required: true, message: '请输入验证码', trigger: 'blur' },
+      ]
+    } //定义路由规则
+
+    const ruleFormRef=ref(null) //设置refs
+
     function resetForm(){
-      ruleFormRef.value.resetFields()
+      ruleFormRef.value.resetFields() //表单重置
     }
-     function sendMsg(){
-      ruleFormRef.value.validateField("name",async (errorMessage:string) => {
+
+     //发送邮件
+    function sendMsg(){
+      ruleFormRef.value.validateField("email",async (errorMessage:string) => {
             if (errorMessage=="") {
-              if(state.ruleForm.name=="test@ng2-oa.com"){
+              if (state.ruleForm.name == "test@ng2-oa.com") {
                 ElMessage('请使用验证码123456登陆')
                 return false;
-              }else{
-                try {
-                  let data=await sendMail(state.ruleForm.name)
-
-                  if(data.data.code==200){
-                    ElMessage('您的验证码已经发送到你邮箱中，请登陆邮箱查看')
-                  }else{
-                    ElMessage('您的邮箱未授权，或者邮箱错误')
-                  }
-                  return false;
-                }catch (e) {
-                  //console.log(e)
-
-                  return false;
-                }
               }
-            } else {
-              return false;
+
+              try {
+                let data = await sendMail(state.ruleForm.name)
+
+                if (data.data.code == 200) {
+                  ElMessage('您的验证码已经发送到你邮箱中，请登陆邮箱查看')
+                } else {
+                  ElMessage('您的邮箱未授权，或者邮箱错误')
+                }
+              } catch (e) {
+
+              }
+            
             }
           });
-
     }
     function submitForm(){
       ruleFormRef.value.validate(async (valid) => {
         if (valid) {
           try {
-            let data=await  Login(state.ruleForm.name,state.ruleForm.code)
+            let data=await  Login(state.ruleForm.email,state.ruleForm.code)
             if(data.data.code==200){
               localStorage.setItem('token', data.data.token);
               core.bus.emit("login",true)
-              doTo("namespace")
-            }else{
-              ElMessage('验证码不正确')
+              doTo("ns-list") //登录成功后跳转
             }
-
           }catch (e) {
-            console.log(e)
-            return false;
+            
           }
-
-        } else {
-          return false;
         }
       });
     }
     return {
       ...toRefs(state),
+      rules,
       ruleFormRef,
       resetForm,
       submitForm,

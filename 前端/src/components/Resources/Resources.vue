@@ -15,8 +15,8 @@
 <script lang="ts">
 import {ref, defineComponent, reactive, computed, toRefs, watch} from 'vue'
 import {doTo} from '../../router';
-import {getList} from "../../api/token/namespace/ns";
-import {getRoleResources} from "../../api/token/resources";
+import {getNsList} from "../../api/token/namespace/ns";
+import {getResources} from "../../api/token/common/common";
 export default defineComponent({
   props:['defaultKey'],
   name: 'Resources',
@@ -28,7 +28,7 @@ export default defineComponent({
     let defaultKey=ref([])
     async function flush(){
       try {
-        let tData=await getRoleResources()
+        let tData=await getResources()
         localStorage.setItem("ResourcesList",JSON.stringify(tData.data.data))
         state.ResourcesList=tData.data.data
       }catch (e){

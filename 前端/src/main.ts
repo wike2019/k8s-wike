@@ -10,7 +10,7 @@ import './style/index.less'
 import './style/font-awesome/css/font-awesome.min.css'
 const app = createApp(App)
 //引入router
-import router from './router/index.ts'
+import router from './router/index'
 
 app.use(ElementPlus)
 

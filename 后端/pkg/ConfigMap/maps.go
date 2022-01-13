@@ -3,8 +3,8 @@ package ConfigMap
 import (
 	"fmt"
 	corev1 "k8s.io/api/core/v1"
-	"k8sapi/pkg/Common"
-	Other "k8sapi/pkg/other"
+	"k8sapi/pkg/common"
+	"k8sapi/pkg/helper"
 	"sort"
 	"sync"
 )
@@ -16,15 +16,15 @@ type cm struct {
 }
 
 func newcm(c *corev1.ConfigMap) *cm  {
-	helpers:=&Common.Helper{}
+	helpers:=&helper.Helper{}
 	return &cm{
 		cmdata:c,//原始对象
 		md5:helpers.Md5Data(c.Data),
 	}
 }
 type ConfigMapStruct struct {
-	Helper *Common.Helper `inject:"-"`
-	data sync.Map   // [ns string] []*cm
+	Helper *helper.Helper `inject:"-"`
+	data sync.Map         // [ns string] []*cm
 }
 func(this *ConfigMapStruct) Get(ns string,name string) *corev1.ConfigMap{
 	if items,ok:=this.data.Load(ns);ok{
@@ -40,7 +40,7 @@ func(this *ConfigMapStruct) Add(item *corev1.ConfigMap){
 	if list,ok:=this.data.Load(item.Namespace);ok{
 		list=append(list.([]*cm),newcm(item))
 		this.data.Store(item.Namespace,list)
-		Other.AddAutoComplete(fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s","configmap",item.Namespace,item.Name),item.Name,0)
+		common.AddAutoComplete(fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s","configmap",item.Namespace,item.Name),item.Name,0)
 	}else{
 		this.data.Store(item.Namespace,[]*cm{newcm(item)})
 	}
@@ -64,7 +64,7 @@ func(this *ConfigMapStruct) Delete(svc *corev1.ConfigMap){
 			if range_item.cmdata.Name==svc.Name{
 				newList:= append(list.([]*cm)[:i], list.([]*cm)[i+1:]...)
 				this.data.Store(svc.Namespace,newList)
-				Other.DeleteAutoComplete(
+				common.DeleteAutoComplete(
 					fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",
 						"configmap",range_item.cmdata.Namespace,range_item.cmdata.Name))
 				break

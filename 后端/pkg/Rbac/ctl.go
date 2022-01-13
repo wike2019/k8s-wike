@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
+	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
-	"k8sapi/pkg/Common"
-	rbacv1 "k8s.io/api/rbac/v1"
+	"k8sapi/pkg/helper"
 	"os"
 	"path"
 	"path/filepath"
@@ -18,8 +18,8 @@ import (
 )
 
 type RBACCtl struct {
-	RoleService *RoleService `inject:"-"`
-	Helper  *Common.Helper `inject:"-"`
+	RoleService *RoleService     `inject:"-"`
+	Helper  *helper.Helper       `inject:"-"`
 	Client *kubernetes.Clientset `inject:"-"`
 }
 
@@ -286,7 +286,7 @@ func(this *RBACCtl) UaList(c *gin.Context) goft.Json{
 	keyReg:=regexp.MustCompile(".*_key.pem")
 	users:=make([]*UAModel,0)
 	suffix:=".pem"
-	err:= filepath.Walk(Common.UserPath, func(p string, f os.FileInfo, err error) error {
+	err:= filepath.Walk(helper.UserPath, func(p string, f os.FileInfo, err error) error {
 		if f.IsDir() {return nil}
 		if path.Ext(f.Name())==suffix{
 			if !keyReg.MatchString(f.Name()){
@@ -335,7 +335,7 @@ func(this *RBACCtl) Clientconfig(c *gin.Context) goft.Json{
 	clusterName:="kubernetes"
 	cfg.Clusters[clusterName]=&api.Cluster{
 		Server:API,
-		CertificateAuthorityData:this.Helper.CertData(Common.CaCrtPath),
+		CertificateAuthorityData:this.Helper.CertData(helper.CaCrtPath),
 	}
 	contextName:=fmt.Sprintf("%s@kubernetes",user)
 	cfg.Contexts[contextName]=&api.Context{
@@ -343,8 +343,8 @@ func(this *RBACCtl) Clientconfig(c *gin.Context) goft.Json{
 		Cluster:clusterName,
 	}
 	cfg.CurrentContext=contextName
-	userCertFile:=fmt.Sprintf("%s/%s.pem",Common.UserPath,user)
-	userCertKeyFile:=fmt.Sprintf("%s/%s_key.pem",Common.UserPath,user)
+	userCertFile:=fmt.Sprintf("%s/%s.pem", helper.UserPath,user)
+	userCertKeyFile:=fmt.Sprintf("%s/%s_key.pem", helper.UserPath,user)
 	cfg.AuthInfos[user]=&api.AuthInfo{
 		ClientKeyData:this.Helper.CertData(userCertKeyFile),
 		ClientCertificateData:this.Helper.CertData(userCertFile),

@@ -6,13 +6,13 @@ import (
 	netv1 "k8s.io/api/networking/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 //@Service
 type IngressService struct {
 	IngressMapStruct *IngressMapStruct `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
-	Client *kubernetes.Clientset `inject:"-"`
+	Helper *helper.Helper              `inject:"-"` //帮助函数 用于分页
+	Client *kubernetes.Clientset       `inject:"-"`
 }
 func NewIngressService() *IngressService {
 	return &IngressService{}
@@ -20,7 +20,7 @@ func NewIngressService() *IngressService {
 
 
 //对外方法，根据分页取dep列表
-func(this *IngressService) PageDeps(ns string,page,size int ) *Common.ItemsPage{
+func(this *IngressService) PageDeps(ns string,page,size int ) *helper.ItemsPage {
 	ingressList:=this.IngressMapStruct.ListAll(ns)
 	ingressCovert:=make([]interface{},len(ingressList))
 	for i,dep:=range ingressList{

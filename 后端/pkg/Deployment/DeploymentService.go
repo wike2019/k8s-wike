@@ -3,14 +3,13 @@ package Deployment
 import (
 	"github.com/gin-gonic/gin"
 	"k8s.io/api/apps/v1"
-	"k8sapi/pkg/Common"
-
+	"k8sapi/pkg/helper"
 )
 //@Service
 type DeploymentService struct {
 	DepMap *DeploymentMap `inject:"-"`
 	Common *CommonService `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	Helper *helper.Helper `inject:"-"` //帮助函数 用于分页
 }
 func NewDeploymentService() *DeploymentService {
 	return &DeploymentService{}
@@ -45,7 +44,7 @@ func(this *DeploymentService) listByNs(namespace string ) (ret []*Deployment){
 	return
 }
 //对外方法，根据分页取dep列表
-func(this *DeploymentService) PageDeps(ns string,page,size int ) *Common.ItemsPage{
+func(this *DeploymentService) PageDeps(ns string,page,size int ) *helper.ItemsPage {
 	depList:=this.listByNs(ns)
 	depCovert:=make([]interface{},len(depList))
 	for i,dep:=range depList{

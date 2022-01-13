@@ -1,8 +1,8 @@
-package Ns
+package ns
 
 
 //实现命名空间排序
-type Sort []*Model //排序
+type Sort []*ListModel //排序
 func(this Sort) Len() int{
 	return len(this)  //实现排序接口
 }

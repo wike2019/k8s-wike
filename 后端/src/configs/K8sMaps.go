@@ -7,12 +7,12 @@ import (
 	"k8sapi/pkg/Event"
 	"k8sapi/pkg/Ingress"
 	"k8sapi/pkg/Node"
-	"k8sapi/pkg/Ns"
+	"k8sapi/pkg/ns"
 	"k8sapi/pkg/Pod"
 	"k8sapi/pkg/Pvc"
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Rs"
-	"k8sapi/pkg/Sa"
+	"k8sapi/pkg/sa"
 	"k8sapi/pkg/Secret"
 	"k8sapi/pkg/Svc"
 )
@@ -35,8 +35,8 @@ func(this *K8sMaps) InitPodMap() *Pod.PodMapStruct{
 
 
 //初始化 nsmap
-func(this *K8sMaps) InitNsMap() *Ns.MapStruct{
-	return &Ns.MapStruct{}
+func(this *K8sMaps) InitNsMap() *ns.MapStruct{
+	return &ns.MapStruct{}
 }
 
 //初始化 eventmap
@@ -81,8 +81,8 @@ func(this *K8sMaps) InitRoleBindingMap() *Rbac.RoleBindingMapStruct{
 }
 
 //初始化RoleBindingMap
-func(this *K8sMaps) InitSaMap() *Sa.MapStruct{
-	return &Sa.MapStruct{}
+func(this *K8sMaps) InitSaMap() *sa.MapStruct{
+	return &sa.MapStruct{}
 }
 
 //初始化ClusterRole

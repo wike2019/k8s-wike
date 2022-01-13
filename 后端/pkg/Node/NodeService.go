@@ -3,15 +3,14 @@ package Node
 import (
 	"k8s.io/api/core/v1"
 	"k8s.io/metrics/pkg/client/clientset/versioned"
-	"k8sapi/pkg/Common"
-
+	"k8sapi/pkg/helper"
 )
 
 //@service
 type NodeService struct {
-	NodeMap *NodeMapStruct `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
-	NodeHelper *Helper `inject:"-"`//帮助函数 用于分页
+	NodeMap *NodeMapStruct      `inject:"-"`
+	Helper *helper.Helper       `inject:"-"` //帮助函数 用于分页
+	NodeHelper *Helper          `inject:"-"` //帮助函数 用于分页
 	Metric *versioned.Clientset `inject:"-"`
 }
 

@@ -7,16 +7,16 @@ import (
 	"golang.org/x/crypto/ssh"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 	"k8sapi/src/wscore"
 )
 
 //@controller
 type NodeCtl struct {
-	NodeService *NodeService `inject:"-"`
-	Client *kubernetes.Clientset  `inject:"-"`
-	Helper *Common.Helper `inject:"-"`
-	NodeHelper *Helper `inject:"-"`
+	NodeService *NodeService     `inject:"-"`
+	Client *kubernetes.Clientset `inject:"-"`
+	Helper *helper.Helper        `inject:"-"`
+	NodeHelper *Helper           `inject:"-"`
 }
 var NodeShellModes  = ssh.TerminalModes{
 	ssh.ECHO:          1,     // enable echoing

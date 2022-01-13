@@ -7,12 +7,12 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 type SvcCtl struct{
-	SvcMap *ServiceMapStruct `inject:"-"`
-	Helper *Common.Helper `inject:"-"`
+	SvcMap *ServiceMapStruct     `inject:"-"`
+	Helper *helper.Helper        `inject:"-"`
 	Client *kubernetes.Clientset `inject:"-"`
 }
 func NewSvcCtl() *SvcCtl{

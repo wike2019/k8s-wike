@@ -3,7 +3,7 @@ package Rbac
 import (
 	"github.com/gin-gonic/gin"
 	"k8s.io/api/rbac/v1"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 //@Service
@@ -11,7 +11,7 @@ type RoleService struct {
    RoleMap *RoleMapStruct  `inject:"-"`
    RoleBindingMap *RoleBindingMapStruct  `inject:"-"`
    ClusterRoleMap *ClusterRoleMapStruct  `inject:"-"`
-   Common.Helper
+	helper.Helper
    ClusterRoleBindingMap *ClusterRoleBindingMapStruct  `inject:"-"`
 }
 
@@ -20,7 +20,7 @@ func NewRoleService() *RoleService {
 }
 
 //对外方法，根据分页取dep列表
-func(this *RoleService) PageDeps(ns string,page,size int ) *Common.ItemsPage{
+func(this *RoleService) PageDeps(ns string,page,size int ) *helper.ItemsPage {
 	List:=this.RoleMap.ListAll(ns)
 
 	ret:=make([]*RoleModel,len(List))
@@ -61,7 +61,7 @@ func(this *RoleService) rolesAll(ns string)[]*RoleModel{
 }
 
 
-func(this *RoleService) BindPageDeps(ns string,page,size int) *Common.ItemsPage {
+func(this *RoleService) BindPageDeps(ns string,page,size int) *helper.ItemsPage {
 	List:=this.RoleBindingMap.ListAll(ns)
 	ret:=make([]*RoleBindingModel,len(List))
 	for i,item:=range List{
@@ -112,7 +112,7 @@ func(this *RoleService) GetClusterRole(name string) *v1.ClusterRole{
 	return rb
 }
 
-func(this *RoleService) ListClusterRoles(page,size int) *Common.ItemsPage {
+func(this *RoleService) ListClusterRoles(page,size int) *helper.ItemsPage {
 	List:=this.ClusterRoleMap.ListAll()
 	ret:=make([]*ClusterRoleModel,len(List))
 	for i,item:=range List{
@@ -155,7 +155,7 @@ func(this *RoleService) GetClusterRoleBinding(name string) *v1.ClusterRoleBindin
 	return crb
 }
 
-func(this *RoleService) ListClusterRoleBindings(page,size int) *Common.ItemsPage {
+func(this *RoleService) ListClusterRoleBindings(page,size int) *helper.ItemsPage {
 	List:= this.ClusterRoleBindingMap.ListAll()
 	Covert:=make([]interface{},len(List))
 	for i,dep:=range List{

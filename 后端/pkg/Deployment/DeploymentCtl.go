@@ -3,12 +3,12 @@ package Deployment
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 type DeploymentCtl struct {
-	Helper *Common.Helper `inject:"-"`
-	DepService *DeploymentService  `inject:"-"`  //首字母一定要大写
+	Helper *helper.Helper         `inject:"-"`
+	DepService *DeploymentService `inject:"-"`  //首字母一定要大写
 }
 
 func NewDeploymentCtl() *DeploymentCtl {

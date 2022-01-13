@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	corev1 "k8s.io/api/core/v1"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 	"sort"
 	"sync"
 )
 
 type ServiceMapStruct struct {
-	data sync.Map   // [ns string] []*v1.Service
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	data sync.Map         // [ns string] []*v1.Service
+	Helper *helper.Helper `inject:"-"` //帮助函数 用于分页
 }
 
 
@@ -75,7 +75,7 @@ func(this *ServiceMapStruct) ListAll(ns string)[]*ServiceModel{
 }
 
 
-func(this *ServiceMapStruct) PageDeps(ns string,page int) *Common.ItemsPage{
+func(this *ServiceMapStruct) PageDeps(ns string,page int) *helper.ItemsPage {
 	List:=this.ListAll(ns)
 	Covert:=make([]interface{},len(List))
 	for i,dep:=range List{

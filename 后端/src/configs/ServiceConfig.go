@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"k8sapi/pkg/Common"
 	"k8sapi/pkg/ConfigMap"
 	"k8sapi/pkg/Deployment"
 	"k8sapi/pkg/Ingress"
@@ -9,6 +8,7 @@ import (
 	"k8sapi/pkg/Pod"
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Secret"
+	"k8sapi/pkg/helper"
 )
 
 //@Config
@@ -29,8 +29,8 @@ func(*ServiceConfig) DeploymentService() *Deployment.DeploymentService{
 func(*ServiceConfig) PodService() *Pod.PodService{
 	return Pod.NewPodService()
 }
-func(*ServiceConfig) CommonHelper() *Common.Helper{
-	return Common.NewHelper()
+func(*ServiceConfig) CommonHelper() *helper.Helper {
+	return helper.NewHelper()
 }
 
 func(*ServiceConfig) PodHelper() *Pod.Helper{

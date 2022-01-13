@@ -3,20 +3,20 @@ package ConfigMap
 import (
 	"github.com/gin-gonic/gin"
 	"k8s.io/client-go/kubernetes"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 //@service
 type ConfigMapService struct {
 	Client *kubernetes.Clientset `inject:"-"`
-	ConfigMap *ConfigMapStruct  `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	ConfigMap *ConfigMapStruct   `inject:"-"`
+	Helper *helper.Helper        `inject:"-"` //帮助函数 用于分页
 }
 func NewConfigMapService() *ConfigMapService {
 	return &ConfigMapService{}
 }
 //前台用于显示Secret列表
-func(this *ConfigMapService) PageDeps(ns string,page,size int ) *Common.ItemsPage{
+func(this *ConfigMapService) PageDeps(ns string,page,size int ) *helper.ItemsPage {
 	ConfigMapList:=this.ConfigMap.ListAll(ns)
 	ConfigMapCovert:=make([]interface{},len(ConfigMapList))
 	for i,dep:=range ConfigMapList{

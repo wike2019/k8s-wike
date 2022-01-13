@@ -1,34 +1,27 @@
-package Sa
+package sa
 
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	corev1 "k8s.io/api/core/v1"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/common"
+	"k8sapi/pkg/helper"
 	"sort"
 	"sync"
 )
 
 type MapStruct struct {
-	data sync.Map   // [ns string] []*v1.Service
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	data sync.Map         // [ns string] []*v1.Service
+	Helper *helper.Helper `inject:"-"` //帮助函数 用于分页
 }
 
 
 //获取单个Service
-func(this *MapStruct) Get(ns string,name string) *Model{
+func(this *MapStruct) Get(ns string,name string) *corev1.ServiceAccount{
 	if items,ok:=this.data.Load(ns);ok{
 		for _,item:=range items.([]*corev1.ServiceAccount){
 			if item.Name==name{
-				return &Model{
-					Name:item.Name,
-					CreateTime:item.CreationTimestamp.Format("2006-01-02 15:04:05"),
-					Namespace:item.Namespace,
-					Secrets:item.Secrets,
-					ImagePullSecrets:item.ImagePullSecrets,
-					Labels:item.Labels,
-					Annotations:item.Annotations,
-				}
+				return  item
 			}
 		}
 	}
@@ -38,14 +31,15 @@ func(this *MapStruct) Add(sa *corev1.ServiceAccount){
 	if list,ok:=this.data.Load(sa.Namespace);ok{
 		list=append(list.([]*corev1.ServiceAccount),sa)
 		this.data.Store(sa.Namespace,list)
+		common.AddAutoComplete(fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",sa.Kind,sa.Namespace,sa.Name),sa.Name,0)
 	}else{
 		this.data.Store(sa.Namespace,[]*corev1.ServiceAccount{sa})
 	}
 }
 func(this *MapStruct) Update(sa *corev1.ServiceAccount) error {
 	if list,ok:=this.data.Load(sa.Namespace);ok{
-		for i,range_pod:=range list.([]*corev1.ServiceAccount){
-			if range_pod.Name==sa.Name{
+		for i,saItem:=range list.([]*corev1.ServiceAccount){
+			if saItem.Name==sa.Name{
 				list.([]*corev1.ServiceAccount)[i]=sa
 			}
 		}
@@ -55,37 +49,37 @@ func(this *MapStruct) Update(sa *corev1.ServiceAccount) error {
 }
 func(this *MapStruct) Delete(sa *corev1.ServiceAccount){
 	if list,ok:=this.data.Load(sa.Namespace);ok{
-		for i,range_svc:=range list.([]*corev1.ServiceAccount){
-			if range_svc.Name==sa.Name{
+		for i,saItem:=range list.([]*corev1.ServiceAccount){
+			if saItem.Name==sa.Name{
 				newList:= append(list.([]*corev1.ServiceAccount)[:i], list.([]*corev1.ServiceAccount)[i+1:]...)
 				this.data.Store(sa.Namespace,newList)
+				common.DeleteAutoComplete(
+					fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",
+						sa.Kind,sa.Namespace,sa.Name))
 				break
 			}
 		}
 	}
 }
-func(this *MapStruct) ListAll(ns string)[]*Model{
+func(this *MapStruct) ListAll(ns string)[]*ListModel{
 	if list,ok:=this.data.Load(ns);ok{
 		newList:=list.([]*corev1.ServiceAccount)
 		sort.Sort(CoreV1ServiceAccount(newList))//  按时间倒排序
-		ret:=make([]*Model,len(newList))
+		ret:=make([]*ListModel,len(newList))
 		for i,item:=range newList{
-			ret[i]=&Model{
+			ret[i]=&ListModel{
 				Name:item.Name,
 				CreateTime:item.CreationTimestamp.Format("2006-01-02 15:04:05"),
 				Namespace:item.Namespace,
 				Secrets:item.Secrets,
-				ImagePullSecrets:item.ImagePullSecrets,
-				Labels:item.Labels,
-				Annotations:item.Annotations,
 			}
 		}
 		return ret
 	}
-	return []*Model{} //返回空列表
+	return []*ListModel{} //返回空列表
 }
 
-func(this *MapStruct) PageDeps(ns string,page int) *Common.ItemsPage{
+func(this *MapStruct) PageDeps(ns string,page int) *helper.ItemsPage {
 	List:=this.ListAll(ns)
 	Covert:=make([]interface{},len(List))
 	for i,dep:=range List{

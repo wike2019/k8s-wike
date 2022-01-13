@@ -4,12 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
 	corev1 "k8s.io/api/core/v1"
-	"k8sapi/pkg/Common"
+	"k8sapi/pkg/helper"
 )
 
 type Ctl struct{
 	SecretService *Service `inject:"-"`
-	Helper *Common.Helper `inject:"-"`//帮助函数 用于分页
+	Helper *helper.Helper  `inject:"-"` //帮助函数 用于分页
 }
 func NewSecretCtl() *Ctl{
   return &Ctl{}
