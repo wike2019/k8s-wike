@@ -42,6 +42,7 @@ import {createNs, deleteNs, getNsList} from "@/api/token/namespace/ns";
 import {requireRules} from "../../helper/rules";
 import {ElMessage, ElMessageBox} from "element-plus";
 import breadcrumb from  "@/components/common/breadcrumb.vue"
+import {rmTip} from "@/helper/helper";
 export default defineComponent({
   name: 'namespace',
   components: {
@@ -94,15 +95,7 @@ export default defineComponent({
       })
     }
     function doDelete(name){
-      ElMessageBox.confirm(
-          '你确定继续删除操作吗?',
-          'Warning',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-          }
-          )
+      rmTip("命名空间")
           .then(async () => {
             try {
               if (name=="wike-system"){

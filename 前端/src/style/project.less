@@ -14,7 +14,7 @@
     font-size:18px;
   }
 }
-.container-all{margin:20px 40px;min-width:1000px }
+.container-all{margin:20px 40px;}
 .right{float: right}
 
 .aside{width:240px;
@@ -24,7 +24,8 @@
 }
 main{min-width:1000px;margin: auto}
 .flex{display: flex}
-.main_detail_content{margin-left:20px;margin-right:40px;flex: 1}
+.flex1{flex: 1;margin:0 25px}
+.main_detail_content{margin-left:20px;margin-right:40px;flex: 1;overflow: auto}
 
 
 .nav-bar{margin:20px 0 20px 0;border-bottom:1px dashed #ccc;padding-bottom:10px}
@@ -35,7 +36,7 @@ main{min-width:1000px;margin: auto}
 }
 .clear_both{clear: both}
 
-.box-card{margin-bottom:30px}
+.box-card{margin-bottom:20px;box-shadow:0px 0px 2px #8c939d}
 .Success{color: #67C23A}
 .Danger{color: #F56C6C}
 
@@ -84,14 +85,16 @@ main{min-width:1000px;margin: auto}
 .title-common>.el-button{margin-right:20px}
 .yaml-editor{width:98%;padding:10px 5px ;margin-top:10px;background: #2e3440;}
 .yaml-editor .ace_editor{font-size:14px!important;line-height:1.8!important;}
-.inline-title{overflow: hidden;font-size:14px;border-bottom:1px dashed #ccc;padding:15px 10px 15px 10px;vertical-align: middle;font-weight: bold;color:#111}
-.inline-title>span{vertical-align:bottom;float: left;margin-top:15px}
-.card-header{font-weight: bold;color:#303133}
+.inline-title{background:#e4e7ed;display: flex;overflow: hidden;font-size:12px;border:1px solid #ccc;border-radius:4px;margin:20px 0;padding:8px 10px;vertical-align: middle;font-weight: bold;color:#111}
+.inline-title>span{justify-content: center;line-height:32px;text-shadow:0px 0px 2px #8c939d;}
+.inline-title>.el-button,.leftBtn{margin-left: auto;margin-right:10px;}
+.card-header{font-weight: bold;color:#303133;display: flex;vertical-align: middle}
+.card-header .title{line-height:30px;font-size:12px;}
 .Info{color: #909399}
 
 .el-input-number>span{line-height:38px!important;top:3px!important;vertical-align: middle}
 
-.mtb20{margin:20px 0}
+.mtb10{margin:10px 0;overflow: hidden}
 .select{
   margin:0 8px;width:200px
 }
@@ -103,7 +106,8 @@ main{min-width:1000px;margin: auto}
 
 .tip_info{margin-left:15px;color:#ff4d51;position: relative;top:-10px}
 .mf20{margin-left: 20px}
-
+.mf40{margin-left: 40px}
+.m40{margin:0 20px 0 20px!important;}
 .no-btn{line-height:60px}
 
 .list_item{padding:5px;}
@@ -115,7 +119,14 @@ main{min-width:1000px;margin: auto}
 .list_item h4{color:#85ce61;font-size:14px}
 .list_item a{color:#ff4d51;}
 .bar{height:4px;background: #8cc5ff;margin:25px 0}
-.redbar{height:12px;background: #ff4d51;margin:45px 0}
+.redBar{height:12px;background: #ff4d51;margin:45px 0}
 .ace-tm,.ace-tm .ace_gutter{background: #2e3440;}
 
 .ace_editor.ace_autocomplete{width:900px}
+
+.el-form-item{margin-bottom:0!important;}
+
+.submit-box{margin-bottom:20px;}
+.submit-box .el-button{display: block;margin: auto;width:94%;}
+
+.btnList{position: absolute;right:80px;cursor: pointer;z-index:9}

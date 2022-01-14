@@ -1,9 +1,11 @@
 <template>
+  <el-alert title="支持k8s关键字提示,非法字段不会影响提交结果但是会验证yaml语法,非法字段系统会自动过滤,提交前会验证数据是否合法。具体错误信息请看可视化界面" type="error"></el-alert>
+  <div class="footer-common">
+    <el-button size="small" @click="upload">导入文件数据</el-button>
+    <el-button type="primary" size="small" @click="download">下载Yaml文件</el-button>
+  </div>
   <div class="yaml-editor">
     <textarea ref="yamlRef"></textarea>
-  </div>
-  <div class="footer-common">
-    <el-button type="primary" @click="download">下载Yaml文件</el-button>
   </div>
 </template>
 
@@ -17,13 +19,7 @@ import {ElMessage} from "element-plus";
 import {getAutoComplete} from "../../api/token/common/common";
 export default defineComponent({
   name: 'yaml',
-  props: {
-    msg: {
-      type: String,
-      required: true
-    }
-  },
-  emits:["input","err"],
+  emits:["input"],
   setup: (props,{emit}) => {
     let yamlRef=ref(null)
     let state=reactive({
@@ -46,9 +42,7 @@ export default defineComponent({
       });
       editor.completers.push({
         getCompletions: async  function(editor, session, pos, prefix, callback) {
-          console.log(prefix)
           let data=await getAutoComplete()
-          console.log(data.data)
           if (prefix.length === 0) {
             return callback(null, []);
           } else {
@@ -69,21 +63,22 @@ export default defineComponent({
 
 
     function setData(json){
+        if(!json){
+          json=""
+        }
         nextTick(()=>{
           try {
-              if(state.md5!=md5(JSON.stringify(json||""))){
+
+              let value=jsyaml.dump(json)
+              state.md5=md5(JSON.stringify(json))
+              editor.setValue(value);
+              if(state.md5!=md5(JSON.stringify(json))){
                 emit("input",json)
               }
-              let value=jsyaml.dump(json)
-              state.md5=md5(JSON.stringify(json||""))
-              editor.setValue(value);
-
           }catch (e) {
-            console.log(e)
+            ElMessage.error("数据不合法") //提示错误消息
           }
         })
-
-
     }
     function Update(){
       let session = editor.getSession();
@@ -91,22 +86,33 @@ export default defineComponent({
       editor.gotoLine(count, session.getLine(count - 1).length);
       editor.focus()
     }
-    function check(){
-
-    }
     function download(){
-      core.fileDownLoad(editor.getValue(),"value.yaml")
+      core.fileDownLoad(editor.getValue(),"text.yaml")
     }
     function send(){
       try {
         let json=jsyaml.load(state.data)
         emit("input",json)
       }catch (e) {
-        emit("err","")
+        ElMessage.error("数据不合法") //提示错误消息
       }
     }
-
-    return {yamlRef,setData,download,Update,send}
+    function upload(){
+      let fileDom= document.createElement("input")
+      fileDom.type="file"
+      fileDom.onchange=function (e) {
+        if(e.target.files.length>0){
+          e.target.result
+        }
+            const reader=new FileReader()
+            reader.readAsText(e.target.files[0],'UTF-8')
+            reader.onload=(e)=>{
+              editor.setValue(e.target.result);
+            }
+      }
+      fileDom.click();
+    }
+    return {yamlRef,setData,download,Update,send,upload}
   }
 })
 </script>

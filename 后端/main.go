@@ -43,6 +43,8 @@ var keywords=[]string{
 var keywordsValue=[]string{
 	"kubernetes.io/tls",
 	"kubernetes.io/dockercfg",
+	"Namespace",
+	"v1",
 }
 
 

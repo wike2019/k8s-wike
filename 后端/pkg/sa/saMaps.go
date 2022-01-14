@@ -31,7 +31,7 @@ func(this *MapStruct) Add(sa *corev1.ServiceAccount){
 	if list,ok:=this.data.Load(sa.Namespace);ok{
 		list=append(list.([]*corev1.ServiceAccount),sa)
 		this.data.Store(sa.Namespace,list)
-		common.AddAutoComplete(fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",sa.Kind,sa.Namespace,sa.Name),sa.Name,0)
+		common.AddAutoComplete(fmt.Sprintf("资源类型:%s 命名空间:%s 资源名称: %s","ServiceAccount",sa.Namespace,sa.Name),sa.Name,0)
 	}else{
 		this.data.Store(sa.Namespace,[]*corev1.ServiceAccount{sa})
 	}
@@ -54,8 +54,7 @@ func(this *MapStruct) Delete(sa *corev1.ServiceAccount){
 				newList:= append(list.([]*corev1.ServiceAccount)[:i], list.([]*corev1.ServiceAccount)[i+1:]...)
 				this.data.Store(sa.Namespace,newList)
 				common.DeleteAutoComplete(
-					fmt.Sprintf("资源类型：%s 命名空间：%s 资源名称 %s",
-						sa.Kind,sa.Namespace,sa.Name))
+					fmt.Sprintf("资源类型:%s 命名空间:%s 资源名称: %s","ServiceAccount",sa.Namespace,sa.Name))
 				break
 			}
 		}

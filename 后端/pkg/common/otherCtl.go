@@ -32,7 +32,7 @@ func AddSySAutoComplete(key string){ //添加系统关键字
 func AddValueAutoComplete(key string){ //添加系统关键字-值
 	mutex.Lock()
 	defer mutex.Unlock()
-	data:=map[string]interface{}{"meta":"k8s系统关键字-用于值","caption":key,"value":key,"score":20}
+	data:=map[string]interface{}{"meta":"k8s系统值","caption":key,"value":key,"score":20}
 	AutoCompleteData =append(AutoCompleteData,data)
 }
 func DeleteAutoComplete(meta string)  {  //资源被删除同时删除提示

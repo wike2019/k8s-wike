@@ -52,7 +52,7 @@ import {createRouter, createWebHashHistory, RouteRecordRaw, useRouter} from 'vue
 import  saList from "../views/sa/sa-list.vue"
 // import  saDetail from "../views/sa/sa-detail.vue"
 // import  saUpdate from "../views/sa/sa-update.vue"
-// import  saCreate from "../views/sa/sa-create.vue"
+import  saCreate from "../views/sa/sa-create.vue"
 //
 //
 // import  secretList from "../views/secret/secret-list.vue"
@@ -109,11 +109,11 @@ const routes:RouteRecordRaw[]= [
     //     name: 'sa-update',
     //     component: saUpdate
     // },
-    // {
-    //     path: '/sa-create',
-    //     name: 'sa-create',
-    //     component: saCreate
-    // },
+    {
+        path: '/sa-create',
+        name: 'sa-create',
+        component: saCreate
+    },
     //=========需要重构的============
     // {
     //     path: '/deploy-create',

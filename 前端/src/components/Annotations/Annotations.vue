@@ -1,5 +1,7 @@
 <template>
-
+    <div class="inline-title">
+      <span>注解数据设置</span>         <el-button type="primary" size="small" class="leftBtn" @click="addItem" >添加注释</el-button>
+    </div>
     <div v-if="type=='ingress'">
       <div class="mtb20">
         <span class="fast_action">快捷操作</span>
@@ -8,23 +10,28 @@
       </div>
       <el-divider></el-divider>
     </div>
-    <MyLabel @input="input" ref="MateRef"></MyLabel>
+    <labelValue @input="getData($event,'annotations',form)" :value="form.annotations" ref="MyLabelRef" :label="true"></labelValue>
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, ref, toRefs, watch,nextTick,onMounted} from 'vue'
-import MyLabel from "../Label/label.vue"
+import {defineComponent, reactive, ref, toRefs, watch} from 'vue'
+import labelValue from "@/components/labelValue/labelValue.vue"
+import {arrToMap, getData, MapToArr,IsDirty} from "@/helper/helper";
 export default defineComponent({
-  components:{MyLabel},
-  name: 'Annotations',
+  components:{labelValue},
+  name: 'annotations',
   emits:["input"],
-  props:['type'],
+  props:['type',"value"],
   setup(props,{emit}){
-    let MateRef=ref(null)
+    let MyLabelRef=ref(null)
     let state=reactive({
       enable_cors:false,
       enable_rewriter:false,
-      type:props.type||""
+      type:props.type||"",
+      md5:"",
+      form:{
+        annotations:[]
+      }
     })
     let data=[
       {
@@ -61,39 +68,39 @@ export default defineComponent({
         required:true
       },
     ]
-    let cache=[]
-    function input(data){
-      cache=data
-      emit("input",data)
-    }
-    function setData(data) {
-      MateRef.value.setData(data)
-    }
+
     async function Check(){
-      return  MateRef.value.Check()
+      return  MyLabelRef.value.Check()
     }
-    function addPathCfg(){
-      MateRef.value.addPathCfg()
+    function addItem(){
+      MyLabelRef.value.addItem()
     }
     watch(()=>state.enable_cors,function (){
-       let oldCache=cache
-       clear_cors(oldCache)
+       clear_cors()
        if(state.enable_cors){
-       add_cors(oldCache)
+       add_cors()
        }
-        MateRef.value.setData(oldCache)
-        emit("input",oldCache)
     },{deep:true,flush:"post"})
     watch(()=>state.enable_rewriter,function (){
-      let oldCache=cache
-      clear_rewriter(oldCache)
+      clear_rewriter()
       if(state.enable_rewriter){
-        add_rewriter(oldCache)
+        add_rewriter()
       }
-        MateRef.value.setData(oldCache)
-        emit("input",oldCache)
     },{deep:true,flush:"post"})
-    function add_rewriter(cache){
+    function AddTitle(list){
+      for (let i=0;i<list.length;i++){
+        for (let j=0;j<data.length;j++){
+           if(list[i].key==data[j].key){
+             list[i].name=data[j].name
+           }
+        }
+        if(list[i].key=="nginx.ingress.kubernetes.io/rewrite-target"){
+          list[i].name="重写规则"
+        }
+      }
+      return list
+    }
+    function add_rewriter(){
 
        let data= {
           key:"nginx.ingress.kubernetes.io/rewrite-target",
@@ -101,34 +108,48 @@ export default defineComponent({
           name:"重写规则",
           required:true
         }
-      cache.push(data)
+       state.form.annotations.push(data)
     }
-    function clear_rewriter(cache){
-      for (let i=0;i<cache.length;i++){
-        if(cache[i].key=="nginx.ingress.kubernetes.io/rewrite-target"){
-          console.log(cache[i].key)
-          cache.splice(i,1)
+    function clear_rewriter(){
+      for (let i=0;i< state.form.annotations.length;i++){
+        if( state.form.annotations[i].key=="nginx.ingress.kubernetes.io/rewrite-target"){
+          state.form.annotations.splice(i,1)
         }
       }
     }
-    function clear_cors(cache){
-      for (let i=0;i<cache.length;i++){
+    function clear_cors(){
+      for (let i=0;i< state.form.annotations.length;i++){
         for (let j=0;j<data.length;j++){
-          if(cache[i].key==data[j].key){
-            console.log(cache[i].key)
-            cache.splice(i,1)
+          if( state.form.annotations[i].key==data[j].key){
+            state.form.annotations.splice(i,1)
           }
-
         }
       }
     }
-    function add_cors(cache){
+    function add_cors(){
       for (let i=0;i<data.length;i++){
-        cache.push(data[i])
+        state.form.annotations.push(data[i])
       }
     }
+    function commit(){
+      emit("input",arrToMap(state.form.annotations))
+    }
+    watch(()=>props.value,()=>{
+      if(props.value){
+        state.form.annotations=AddTitle(MapToArr(props.value))
+      }else{
+        state.md5=""
+        state.form.annotations=[]
+      }
 
-    return {MateRef,Check,input,addPathCfg,...toRefs(state),setData}
+    })
+    watch(()=>state.form,()=>{
+      if(IsDirty(state,4)){
+        return
+      }
+     commit()
+    },{deep:true,flush:"post"})
+    return {MyLabelRef,Check,getData,addItem,...toRefs(state)}
   }
 })
 </script>

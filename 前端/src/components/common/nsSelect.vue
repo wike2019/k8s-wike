@@ -6,7 +6,7 @@
                  :label="ns.name"
                  :value="ns.name"/>
     </el-select>
-    <el-button style="margin-left:40px" type="primary" @click="doTo(url)">{{btn}}</el-button>
+    <el-button class="mf40" type="primary" @click="doTo(url)">{{btn}}</el-button>
   </div>
 </template>
 

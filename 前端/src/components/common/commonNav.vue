@@ -2,8 +2,8 @@
   <div class="aside">
 
     <el-menu   default-active="1" class="el-menu-vertical-demo">
-      <el-sub-menu index="1">
-        <template #title>
+      <el-sub-menu index="1"  >
+        <template #title >
           <i class="fa fa-address-book" aria-hidden="true"></i>
           <span>全局资源</span>
         </template>

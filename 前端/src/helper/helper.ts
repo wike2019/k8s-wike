@@ -1,4 +1,6 @@
-import {ElMessageBox} from "element-plus";
+import {ElLoading, ElMessage, ElMessageBox} from "element-plus";
+import md5 from "js-md5";
+import {nextTick} from "vue";
 
 export  function getData(data,keys,obj){
     let arr=keys.split('.')
@@ -102,7 +104,6 @@ export function arrToMap(input){
 }
 export function MapToArr(input){
     let arr=[]
-    console.warn(input)
     for (let i in input){
         arr.push({key:i,value:input[i],NoRequired:!!input[i]})
     }
@@ -115,15 +116,15 @@ export function  rowToQuery(row){
 export function copyData(state,tData){
     let T=tData.data.data
     state.List=T.Data
-    state.pageInfo=T.Total
-    state.current_page=T.Current
+    state.pageTotal=T.Total
+    state.currentPage=T.Current
 }
 export function wsCopyData(state,tData,type){
     let T=tData.result;
     if(tData.type==type&&tData.ns==state.namespace){
         state.List=T.Data
-        state.pageInfo=T.Total
-        state.current_page=T.Current
+        state.pageTotal=T.Total
+        state.currentPage=T.Current
     }
 }
 export  function rmTip(name){
@@ -136,4 +137,73 @@ export  function rmTip(name){
             type: 'warning',
         }
     )
+}
+
+export  function createTip(){
+    return ElMessageBox.confirm(
+        '你确定要继续操作吗?',
+        'Warning',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
+}
+export function IsDirty(state,num){
+    if (state.md5==md5(JSON.stringify(state.form))){
+        return true
+    }
+    state.md5=md5(JSON.stringify(state.form))
+    return  false
+}
+let  loading
+export function showErr(msg,back){
+    loading=ElLoading.service({
+        lock: true,
+        text: '',
+        spinner:"failed",
+        background: 'rgba(0, 0, 0, 0.7)',
+    })
+    ElMessage({
+        type: 'error',
+        grouping: true,
+        message:msg||"YAML内容有误,请仔细编辑",
+        showClose:true,
+        duration:0,
+        onClose:function () {
+            loading.close()
+            back()
+        }
+    })
+}
+
+export  function CheckData(list,num){
+    return new Promise(async function (resolve) {
+        for (let i = 0; i < list.length; i++) {
+            try {
+                await list[i].value.Check()
+                resolve(true)
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        resolve(true)
+    })
+
+}
+export   function  IsReady(CreateFn,state){
+    setTimeout(async ()=>{
+        let list=document.querySelector('.el-form-item__error')
+        if (!list) {
+            try {
+                let result = await CreateFn(state.form)
+                if (result.data.code == 200) {
+                  ElMessage("ServiceAccount资源创建成功")
+                }
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    },100)
 }

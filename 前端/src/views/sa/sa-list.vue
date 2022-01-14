@@ -52,11 +52,11 @@
          <el-pagination
              @current-change="pageChange"
              background
-             :current-page="current_page"
+             :current-page="currentPage"
              :page-size="10"
              :hide-on-single-page="true"
              layout="prev, pager, next"
-             :total="pageInfo">
+             :total="pageTotal">
          </el-pagination>
        </div>
      </div>
@@ -96,10 +96,9 @@ export default defineComponent({
       namespace:"default",
       dialogVisible:false,
       token:'',
-      pageInfo:0,
-      current_page:1,
+      pageTotal:0,
+      currentPage:1,
     })
-    let formRef=ref(null)
 
     async function changeNs(ns){
       state.namespace=ns
@@ -140,7 +139,7 @@ export default defineComponent({
 
     }
     function pageChange(page){
-      state.current_page=page
+      state.currentPage=page
       changeNs(state.namespace)
     }
 
