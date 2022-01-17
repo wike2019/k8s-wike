@@ -50,12 +50,12 @@ import {createRouter, createWebHashHistory, RouteRecordRaw, useRouter} from 'vue
  import login from "../views/common/login.vue";
 //
 import  saList from "../views/sa/sa-list.vue"
-// import  saDetail from "../views/sa/sa-detail.vue"
-// import  saUpdate from "../views/sa/sa-update.vue"
+import  saDetail from "../views/sa/sa-detail.vue"
+import  saUpdate from "../views/sa/sa-update.vue"
 import  saCreate from "../views/sa/sa-create.vue"
 //
 //
-// import  secretList from "../views/secret/secret-list.vue"
+import  secretList from "../views/secret/secret-list.vue"
 // import  secretCreate from "../views/secret/secret-create.vue"
 // import  secretDetail from "../views/secret/secret-detail.vue"
 // import  secretUpdate from "../views/secret/secret-update.vue"
@@ -99,20 +99,25 @@ const routes:RouteRecordRaw[]= [
         name: 'sa-list',
         component: saList
     },
-    // {
-    //     path: '/sa-detail',
-    //     name: 'sa-detail',
-    //     component: saDetail
-    // },
-    // {
-    //     path: '/sa-update',
-    //     name: 'sa-update',
-    //     component: saUpdate
-    // },
+    {
+        path: '/sa-detail',
+        name: 'sa-detail',
+        component: saDetail
+    },
+    {
+        path: '/sa-update',
+        name: 'sa-update',
+        component: saUpdate
+    },
     {
         path: '/sa-create',
         name: 'sa-create',
         component: saCreate
+    },
+    {
+        path: '/secret-list',
+        name: 'secret-list',
+        component: secretList
     },
     //=========需要重构的============
     // {
@@ -126,11 +131,7 @@ const routes:RouteRecordRaw[]= [
     //     name: 'secret-detail',
     //     component: secretDetail
     // },
-    // {
-    //     path: '/secret-list',
-    //     name: 'secret-list',
-    //     component: secretList
-    // },
+
     // {
     //     path: '/secret-create',
     //     name: 'secret-create',

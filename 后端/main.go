@@ -4,21 +4,22 @@ import (
 	"embed"
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
-	"k8sapi/pkg/common"
 	"k8sapi/pkg/ConfigMap"
 	"k8sapi/pkg/Deployment"
+	event "k8sapi/pkg/Event"
 	"k8sapi/pkg/Ingress"
 	"k8sapi/pkg/Node"
 	"k8sapi/pkg/Pod"
 	"k8sapi/pkg/Pvc"
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Resources"
-	"k8sapi/pkg/sa"
-	"k8sapi/pkg/Secret"
+	"k8sapi/pkg/secret"
 	"k8sapi/pkg/Svc"
 	"k8sapi/pkg/User"
 	"k8sapi/pkg/Ws"
+	"k8sapi/pkg/common"
 	"k8sapi/pkg/ns"
+	"k8sapi/pkg/sa"
 	"k8sapi/src/configs"
 	"net/http"
 )
@@ -83,7 +84,14 @@ func Cors() gin.HandlerFunc {
 }
 
 func main() {
-	web:=goft.Ignite(Cors(), gin.Recovery()).Config(
+	web:=goft.Ignite(Cors(), func(context *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				context.AbortWithStatusJSON(400, gin.H{"error": err})
+			}
+		}()
+		context.Next()
+	}).Config(
 		configs.NewK8sHandler(),  //1
 		configs.NewK8sConfig(), //2
 		configs.NewK8sMaps(), //3
@@ -97,7 +105,7 @@ func main() {
 			User.NewUserCtl(),
 			Ingress.NewIngressCtl(),
 			Svc.NewSvcCtl(),
-			Secret.NewSecretCtl(),
+			secret.NewSecretCtl(),
 			ConfigMap.NewConfigMapCtl(),
 			Node.NewNodeCtl(),
 			Rbac.NewRBACCtl(),
@@ -105,6 +113,7 @@ func main() {
 			sa.NewSaCtl(),
 			Pvc.NewSaCtl(),
 			common.NewOtherCtl(),
+			event.NewEventCtl(),
 		)
 	web.Engine.GET("/", func(c *gin.Context) {
 		c.FileFromFS("/html/"+c.Param("filepath"),http.FS(dist))

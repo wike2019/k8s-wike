@@ -1,15 +1,27 @@
 import {ElLoading, ElMessage, ElMessageBox} from "element-plus";
 import md5 from "js-md5";
 import {nextTick} from "vue";
+import {checkYaml} from "./rules";
 
-export  function getData(data,keys,obj){
+export  function getData(data,keys,obj,doDelete){
     let arr=keys.split('.')
     for (let i =0;i<arr.length-1;i++){
         obj=obj[arr[i]]
     }
-    obj[arr[arr.length-1]]=data
+
+    if( hasValues(data)){
+        obj[arr[arr.length-1]]=data
+    }else{
+        if (doDelete){
+            delete obj[arr[arr.length-1]]
+        }
+
+    }
 }
 
+export  function hasValues(data){
+    return data&&Object.values(data).length
+}
 export function data2arr(newData,oldData,obj){
     for (let i in newData){ //修改老的
         let find=false
@@ -150,33 +162,44 @@ export  function createTip(){
         }
     )
 }
-export function IsDirty(state,num){
-    if (state.md5==md5(JSON.stringify(state.form))){
-        return true
+function  convert(data){
+    let temp
+    try {
+        temp= JSON.stringify(JSON.parse(JSON.stringify(data)))
+    }catch (e) {
+        console.log(e)
+        temp=""
     }
-    state.md5=md5(JSON.stringify(state.form))
+
+   return temp
+}
+export function IsDirty(state,props,root,flag){
+
+    if (root){
+        if (state.md5==md5(convert(state.form))){
+            return true
+        }
+    }
+
+    if (!root){
+        // if (flag==2.2){
+        //     console.error(flag,props,state.form,state.md5,md5(convert(state.form)),md5(convert(props)),root)
+        //     console.warn(state.md5==md5(convert(state.form)),state.md5==md5(convert(props)),"*****")
+        // }
+        if (state.md5==md5(convert(state.form))&&state.md5==md5(convert(props))){
+           // console.log(flag,"不执行更新")
+            return true
+        }
+    }
+    // if (flag==2.2){
+    //     console.log(flag,"执行更新")
+    // }
+
+    state.md5=md5(convert(state.form))
     return  false
 }
 let  loading
-export function showErr(msg,back){
-    loading=ElLoading.service({
-        lock: true,
-        text: '',
-        spinner:"failed",
-        background: 'rgba(0, 0, 0, 0.7)',
-    })
-    ElMessage({
-        type: 'error',
-        grouping: true,
-        message:msg||"YAML内容有误,请仔细编辑",
-        showClose:true,
-        duration:0,
-        onClose:function () {
-            loading.close()
-            back()
-        }
-    })
-}
+
 
 export  function CheckData(list,num){
     return new Promise(async function (resolve) {
@@ -192,18 +215,119 @@ export  function CheckData(list,num){
     })
 
 }
-export   function  IsReady(CreateFn,state){
+export async  function  IsReady(CreateFn,state,msg,flag){
+    if(flag){
+        let result = await CreateFn(state.form)
+        if (result.data.code == 200) {
+            ElMessage(msg)
+        }
+        return
+    }
+    document.getElementById("errorReport").innerHTML=""
     setTimeout(async ()=>{
-        let list=document.querySelector('.el-form-item__error')
-        if (!list) {
+
+        state.hasErr=false
+        let list=document.querySelectorAll('.el-form-item__error')
+        if (!list.length) {
             try {
                 let result = await CreateFn(state.form)
                 if (result.data.code == 200) {
-                  ElMessage("ServiceAccount资源创建成功")
+                  ElMessage(msg)
                 }
             } catch (e) {
                 console.log(e)
             }
+        }else{
+            for (let i=0;i<list.length;i++){
+                let node=list[i].cloneNode(true)
+                document.getElementById("errorReport").appendChild(node)
+            }
+            ElMessage.error("数据不合法")
+            state.hasErr=true
         }
     },100)
+}
+export  function showError(msg){
+    ElMessage.error(msg)
+}
+
+export  function uuid(len, radix) {
+    let chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+    let uuid = [], i;
+    radix = radix || chars.length;
+
+    if (len) {
+        // Compact form
+        for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random()*radix];
+    } else {
+        // rfc4122, version 4 form
+        var r;
+
+        // rfc4122 requires these characters
+        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+        uuid[14] = '4';
+
+        // Fill in random data.  At i==19 set the high bits of clock sequence as
+        // per rfc4122, sec. 4.1.5
+        for (i = 0; i < 36; i++) {
+            if (!uuid[i]) {
+                r = 0 | Math.random()*16;
+                uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+            }
+        }
+    }
+
+    return uuid.join('');
+}
+
+export  function initFn(yamlRef,nextTick,state){
+    function Update() {
+        if(state.mode!="json"){
+            yamlRef.value.Update()
+        }else{
+            yamlRef.value.send()
+        }
+    }
+
+    function yamlChange(data) {
+        if (data) {
+            let msg = checkYaml(data, state)
+            console.warn(msg)
+            if (msg) {
+                showErr(msg)
+                return
+            }
+            state.form = data
+        }else{
+            yamlRef.value.setData(state.form)
+        }
+    }
+
+    function back() {
+        state.mode = "yaml"
+        Update()
+    }
+    function showErr(msg){
+        loading=ElLoading.service({
+            lock: true,
+            text: '',
+            spinner:"failed",
+            background: 'rgba(0, 0, 0, 0.7)',
+        })
+        ElMessage({
+            type: 'error',
+            grouping: true,
+            message:msg||"YAML内容有误,请仔细编辑",
+            showClose:true,
+            duration:0,
+            onClose:function () {
+                loading.close()
+                back()
+            }
+        })
+    }
+    return {yamlChange,Update,back,showErr}
+}
+export function deleteOtherInfo(state){
+    delete  state.form.metadata.managedFields
 }

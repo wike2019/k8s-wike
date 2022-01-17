@@ -1,4 +1,4 @@
-package Secret
+package secret
 
 var SECRET_TYPE map[string]string
 

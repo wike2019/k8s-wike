@@ -27,34 +27,34 @@ func(this *MapStruct) Get(ns string,name string) *corev1.ServiceAccount{
 	}
 	return nil
 }
-func(this *MapStruct) Add(sa *corev1.ServiceAccount){
-	if list,ok:=this.data.Load(sa.Namespace);ok{
-		list=append(list.([]*corev1.ServiceAccount),sa)
-		this.data.Store(sa.Namespace,list)
-		common.AddAutoComplete(fmt.Sprintf("资源类型:%s 命名空间:%s 资源名称: %s","ServiceAccount",sa.Namespace,sa.Name),sa.Name,0)
+func(this *MapStruct) Add(item *corev1.ServiceAccount){
+	if list,ok:=this.data.Load(item.Namespace);ok{
+		list=append(list.([]*corev1.ServiceAccount),item)
+		this.data.Store(item.Namespace,list)
+		common.AddAutoComplete(fmt.Sprintf("资源类型:%s 命名空间:%s 资源名称: %s","ServiceAccount",item.Namespace,item.Name),item.Name,0)
 	}else{
-		this.data.Store(sa.Namespace,[]*corev1.ServiceAccount{sa})
+		this.data.Store(item.Namespace,[]*corev1.ServiceAccount{item})
 	}
 }
-func(this *MapStruct) Update(sa *corev1.ServiceAccount) error {
-	if list,ok:=this.data.Load(sa.Namespace);ok{
-		for i,saItem:=range list.([]*corev1.ServiceAccount){
-			if saItem.Name==sa.Name{
-				list.([]*corev1.ServiceAccount)[i]=sa
+func(this *MapStruct) Update(item *corev1.ServiceAccount) error {
+	if list,ok:=this.data.Load(item.Namespace);ok{
+		for i,listItem:=range list.([]*corev1.ServiceAccount){
+			if listItem.Name==item.Name{
+				list.([]*corev1.ServiceAccount)[i]=item
 			}
 		}
 		return nil
 	}
-	return fmt.Errorf("service-%s not found",sa.Name)
+	return fmt.Errorf("service-%s not found",item.Name)
 }
-func(this *MapStruct) Delete(sa *corev1.ServiceAccount){
-	if list,ok:=this.data.Load(sa.Namespace);ok{
-		for i,saItem:=range list.([]*corev1.ServiceAccount){
-			if saItem.Name==sa.Name{
+func(this *MapStruct) Delete(item *corev1.ServiceAccount){
+	if list,ok:=this.data.Load(item.Namespace);ok{
+		for i,listItem:=range list.([]*corev1.ServiceAccount){
+			if listItem.Name==item.Name{
 				newList:= append(list.([]*corev1.ServiceAccount)[:i], list.([]*corev1.ServiceAccount)[i+1:]...)
-				this.data.Store(sa.Namespace,newList)
+				this.data.Store(item.Namespace,newList)
 				common.DeleteAutoComplete(
-					fmt.Sprintf("资源类型:%s 命名空间:%s 资源名称: %s","ServiceAccount",sa.Namespace,sa.Name))
+					fmt.Sprintf("资源类型:%s 命名空间:%s 资源名称: %s","ServiceAccount",item.Namespace,item.Name))
 				break
 			}
 		}

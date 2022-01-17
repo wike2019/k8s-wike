@@ -6,20 +6,20 @@ import (
 )
 
 // namespace 相关的回调handler
-type Handler struct {
-	Map *MapStruct `inject:"-"`
+type NsHandler struct {
+	Map *NsMapStruct `inject:"-"`
 }
-func(this *Handler) OnAdd(obj interface{}){
+func(this *NsHandler) OnAdd(obj interface{}){
 	this.Map.Add(obj.(*corev1.Namespace))
 	ret:=map[string]interface{}{"result":this.Map.ListAll(),"type":"namespace"}
 	wscore.ClientMap.SendAll(ret) //像ws发送数据
 }
-func(this *Handler) OnUpdate(oldObj, newObj interface{}){
+func(this *NsHandler) OnUpdate(oldObj, newObj interface{}){
 	this.Map.Update(newObj.(*corev1.Namespace))
 	ret:=map[string]interface{}{"result":this.Map.ListAll(),"type":"namespace"}
 	wscore.ClientMap.SendAll(ret)
 }
-func(this *Handler) OnDelete(obj interface{}){
+func(this *NsHandler) OnDelete(obj interface{}){
 	if d,ok:=obj.(*corev1.Namespace);ok{
 		this.Map.Delete(d)
 	}

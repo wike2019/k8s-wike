@@ -22,10 +22,19 @@ export  function NameToArr(item){
     return arr
 }
 export  function checkYaml(data,state){
-    if(data.apiVersion!==state.apiVersion|| data.Kind!=state.Kind){
-        state.form.apiVersion=state.apiVersion
-        state.form.Kind=state.Kind
-        return 'apiVersion和Kind不允许修改'
+    for (let i=0;i<state.notModifyList.length;i++){
+        if (state[state.notModifyList[i].key]!=getDataFormKeys(state.notModifyList[i].modify,data)){
+            return  state.notModifyList[i].msg
+        }
     }
     return ""
+}
+function  getDataFormKeys(keys,obj){
+    let keysList=keys.split('.')
+
+    let needModify= obj
+    for (let i=0;i<keysList.length-1;i++){
+        needModify=obj[keysList[i]]
+    }
+    return  needModify[keysList[keysList.length-1]]
 }

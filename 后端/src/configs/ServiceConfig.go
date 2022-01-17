@@ -7,7 +7,7 @@ import (
 	"k8sapi/pkg/Node"
 	"k8sapi/pkg/Pod"
 	"k8sapi/pkg/Rbac"
-	"k8sapi/pkg/Secret"
+	"k8sapi/pkg/secret"
 	"k8sapi/pkg/helper"
 )
 
@@ -45,8 +45,8 @@ func(*ServiceConfig) NodeHelper() *Node.Helper{
 func(*ServiceConfig) IngressService() *Ingress.IngressService{
 	return Ingress.NewIngressService()
 }
-func(*ServiceConfig) SecretService() *Secret.Service{
-	return Secret.NewSecretService()
+func(*ServiceConfig) SecretService() *secret.SecretService{
+	return secret.NewSecretService()
 }
 func(*ServiceConfig) ConfigMapService() *ConfigMap.ConfigMapService{
 	return ConfigMap.NewConfigMapService()
@@ -56,4 +56,8 @@ func(*ServiceConfig) ConfigNodeService() *Node.NodeService{
 }
 func(*ServiceConfig) ConfigRoleService() *Rbac.RoleService{
 	return Rbac.NewRoleService()
+}
+
+func(*ServiceConfig) ConfigSecretHelper() *secret.SecretHelper{
+	return secret.NewHelper()
 }

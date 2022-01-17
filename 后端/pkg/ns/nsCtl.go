@@ -9,20 +9,20 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type Ctl struct{
-	Map *MapStruct `inject:"-"`
+type NsCtl struct{
+	Map *NsMapStruct `inject:"-"`
 	Client *kubernetes.Clientset `inject:"-"`
 }
-func NewNsCtl() *Ctl {
-  return &Ctl{}
+func NewNsCtl() *NsCtl {
+  return &NsCtl{}
 }
 //获取全部 不带分页
-func(this *Ctl) listAll(c *gin.Context) goft.Json{
+func(this *NsCtl) listAll(c *gin.Context) goft.Json{
 	return gin.H{"code":200, "data":this.Map.ListAll()}
 }
 
 //删除
-func(this *Ctl) delete(c *gin.Context) goft.Json{
+func(this *NsCtl) delete(c *gin.Context) goft.Json{
 	name:=c.DefaultQuery("name","")
 
 	if name=="" {
@@ -33,7 +33,7 @@ func(this *Ctl) delete(c *gin.Context) goft.Json{
 	return gin.H{"code":200, "data":"删除成功"}
 }
 //添加
-func(this *Ctl) create(c *gin.Context) goft.Json{
+func(this *NsCtl) create(c *gin.Context) goft.Json{
 	obj:=&CreateModel{}
 	err:=c.ShouldBindJSON(obj)
 	goft.Error(err)
@@ -50,11 +50,11 @@ func(this *Ctl) create(c *gin.Context) goft.Json{
 }
 
 //路由
-func(this *Ctl)  Build(goft *goft.Goft){
+func(this *NsCtl)  Build(goft *goft.Goft){
 	goft.Handle("GET","/ns",this.listAll)
 	goft.Handle("POST","/ns",this.create)
 	goft.Handle("DELETE","/ns",this.delete)
 }
-func(this *Ctl)  Name() string{
+func(this *NsCtl)  Name() string{
 	 return "NsCtl"
 }

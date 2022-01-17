@@ -1,6 +1,6 @@
 import request from "../read";
-export  function  secretListByNs(ns:string,page:number){
-    return request.get("/v1/secret",{params:{ns,current:page}})
+export  function  getSecretist(ns:string,page:number){
+    return request.get("/v1/secret/page",{params:{ns,current:page}})
 }
 
 export  function  secretCreate(data){
@@ -17,5 +17,5 @@ export  function secretDetail(ns,name){
 }
 
 export  function  secretAllByNs(ns:string){
-    return request.get("/v1/secret/all",{params:{ns}})
+    return request.get("/v1/secret",{params:{ns}})
 }

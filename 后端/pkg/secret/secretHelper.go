@@ -1,4 +1,4 @@
-package Secret
+package secret
 
 import (
 	"crypto/tls"
@@ -7,15 +7,15 @@ import (
 	"fmt"
 )
 
-//@Component
-type Helper struct {
-	//	PodMap *Pod.PodMapStruct `inject:"-"`
+
+type SecretHelper struct {
+
 }
-func NewHelper() *Helper {
-	return &Helper{}
+func NewHelper() *SecretHelper {
+	return &SecretHelper{}
 }
 
-func(this *Helper) getCertType( alg x509.PublicKeyAlgorithm) string {
+func(this *SecretHelper) getCertType( alg x509.PublicKeyAlgorithm) string {
 	switch alg{
 	case x509.RSA:
 		return "RSA"
@@ -30,7 +30,7 @@ func(this *Helper) getCertType( alg x509.PublicKeyAlgorithm) string {
 }
 
 //解析证书
-func(this *Helper) ParseCert(name string,crt []byte) CertModel{
+func(this *SecretHelper) ParseCert(name string,crt []byte) CertModel{
 	//fmt.Println(name)
 	if name!="kubernetes.io/tls"{
 		return CertModel{}

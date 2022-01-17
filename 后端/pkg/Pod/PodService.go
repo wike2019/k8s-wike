@@ -12,7 +12,7 @@ import (
 type PodService struct {
 	PodMap *PodMapStruct           `inject:"-"` //pod对象存储集合
 	Common *CommonService          `inject:"-"` //公共服务 例如镜像，状态等处理
-	EventMap *Event.EventMapStruct `inject:"-"` //事件对象存储集合
+	EventMap *event.EventMapStruct `inject:"-"` //事件对象存储集合
 	RsMapStruct *Rs.MapStruct      `inject:"-"` //rs对象
 	Helper *helper.Helper          `inject:"-"` //帮助函数 用于分页
 }
@@ -34,7 +34,7 @@ func(this *PodService) listByNs(ns string) []*Pod{
 			Phase:string(pod.Status.Phase),// 阶段
 			IsReady:this.Common.PosIsReady(pod), //是否就绪
 			IP:[]string{pod.Status.PodIP,pod.Status.HostIP}, //取ip
-			Message:this.EventMap.GetMessage(pod.Namespace,"Pod",pod.Name), //取事件信息
+			Message:this.EventMap.GetMessage(pod.Namespace,"Pod",pod.Name,string(pod.UID)), //取事件信息
 			CreateTime:pod.CreationTimestamp.Format("2006-01-02 15:04:05"),//取时间戳
 		})
 	}
@@ -94,7 +94,7 @@ func(this *PodService) GetDepPod(ns ,name string) []*Pod{
 				Phase:string(pod.Status.Phase),// 阶段
 				IsReady:this.Common.PosIsReady(pod), //是否就绪
 				IP:[]string{pod.Status.PodIP,pod.Status.HostIP}, //取ip
-				Message:this.EventMap.GetMessage(pod.Namespace,"Pod",pod.Name), //取事件信息
+				Message:this.EventMap.GetMessage(pod.Namespace,"Pod",pod.Name,string(pod.UID)), //取事件信息
 				CreateTime:pod.CreationTimestamp.Format("2006-01-02 15:04:05"),//取时间戳
 			})
 		}

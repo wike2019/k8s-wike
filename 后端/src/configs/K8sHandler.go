@@ -12,7 +12,7 @@ import (
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Rs"
 	"k8sapi/pkg/sa"
-	"k8sapi/pkg/Secret"
+	"k8sapi/pkg/secret"
 	"k8sapi/pkg/Svc"
 )
 
@@ -34,12 +34,12 @@ func(this *K8sHandler) PodHandlers() *Pod.PodHandler{
 	return &Pod.PodHandler{}
 }
 //ns handler
-func(this *K8sHandler) NsHandlers() *ns.Handler{
-	return &ns.Handler{}
+func(this *K8sHandler) NsHandlers() *ns.NsHandler{
+	return &ns.NsHandler{}
 }
 // event handler
-func(this *K8sHandler) EventHandlers() *Event.EventHandler{
-	return &Event.EventHandler{}
+func(this *K8sHandler) EventHandlers() *event.EventHandler{
+	return &event.EventHandler{}
 }
 
 // IngressHandler
@@ -51,8 +51,8 @@ func(this *K8sHandler) ServiceHandler() *Svc.ServiceHandler{
 	return &Svc.ServiceHandler{}
 }
 // SecretHandler
-func(this *K8sHandler) SecretHandler() *Secret.Handler{
-	return &Secret.Handler{}
+func(this *K8sHandler) SecretHandler() *secret.SecretHandler{
+	return &secret.SecretHandler{}
 }
 // ConfigMapHandler
 func(this *K8sHandler) ConfigMapHandler() *ConfigMap.ConfigMapHandler{

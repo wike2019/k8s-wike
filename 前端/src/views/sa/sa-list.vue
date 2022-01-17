@@ -14,8 +14,8 @@
          <template #default="scope">
            <p  @click="()=>doTo('sa-detail',rowToQuery(scope.row))"  >
              {{ scope.row.name }}
-             <a style="margin-left:25px" @click.stop="showToken(scope.row.secrets[0].name)">
-               查看token
+             <a style="margin-left:25px" v-for="item in scope.row.secrets" @click.stop="showToken(item.name)">
+               查看{{item.name}}
              </a>
            </p>
          </template>
@@ -84,7 +84,7 @@ import {getSaList, SaDel} from "@/api/token/sa/sa";
 import {secretDetail} from "@/api/token/secret/secret";
 import nsSelect from "@/components/common/nsSelect.vue";
 import breadcrumb from "@/components/common/breadcrumb.vue";
-import {rowToQuery,copyData,wsCopyData,rmTip} from "@/helper/helper";
+import {rowToQuery,copyData,wsCopyData,rmTip,showError} from "@/helper/helper";
 
 export default defineComponent({
   name: 'sa-list',
@@ -103,7 +103,7 @@ export default defineComponent({
     async function changeNs(ns){
       state.namespace=ns
       try {
-          let tData=await getSaList(state.namespace,state.current_page)
+          let tData=await getSaList(state.namespace,state.currentPage)
           copyData(state,tData)
         }catch (e){
           console.log(e)
@@ -135,6 +135,7 @@ export default defineComponent({
           state.dialogVisible=true;
       }catch (e) {
         console.log(e)
+        showError("该数据没有合法token")
       }
 
     }

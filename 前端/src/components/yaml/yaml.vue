@@ -3,6 +3,7 @@
   <div class="footer-common">
     <el-button size="small" @click="upload">导入文件数据</el-button>
     <el-button type="primary" size="small" @click="download">下载Yaml文件</el-button>
+    <el-button type="danger" size="small" @click="doTo('yaml-all')">使用多资源编辑器 (运维专用)</el-button>
   </div>
   <div class="yaml-editor">
     <textarea ref="yamlRef"></textarea>
@@ -10,16 +11,17 @@
 </template>
 
 <script lang="ts">
-import {ref, defineComponent, onMounted, nextTick, reactive} from 'vue'
+import {ref, defineComponent, onMounted, nextTick, reactive, onUnmounted} from 'vue'
 import {doTo} from '../../router';
 import jsyaml  from "js-yaml"
 import {core} from "../../core/core.ts"
 import md5 from 'js-md5';
 import {ElMessage} from "element-plus";
 import {getAutoComplete} from "../../api/token/common/common";
+import {initFn} from "../../helper/helper";
 export default defineComponent({
   name: 'yaml',
-  emits:["input"],
+  emits:["input","err"],
   setup: (props,{emit}) => {
     let yamlRef=ref(null)
     let state=reactive({
@@ -59,6 +61,7 @@ export default defineComponent({
         send()
       })
 
+
     })
 
 
@@ -76,14 +79,12 @@ export default defineComponent({
                 emit("input",json)
               }
           }catch (e) {
-            ElMessage.error("数据不合法") //提示错误消息
+            emit("err","数据格式不正确")
           }
         })
     }
     function Update(){
-      let session = editor.getSession();
-      let count = session.getLength();
-      editor.gotoLine(count, session.getLine(count - 1).length);
+      editor.gotoLine(0, 0);
       editor.focus()
     }
     function download(){
@@ -94,7 +95,8 @@ export default defineComponent({
         let json=jsyaml.load(state.data)
         emit("input",json)
       }catch (e) {
-        ElMessage.error("数据不合法") //提示错误消息
+        console.error(e)
+        emit("err","数据格式不正确")
       }
     }
     function upload(){
@@ -112,7 +114,7 @@ export default defineComponent({
       }
       fileDom.click();
     }
-    return {yamlRef,setData,download,Update,send,upload}
+    return {yamlRef,setData,download,Update,send,upload,doTo,blur}
   }
 })
 </script>

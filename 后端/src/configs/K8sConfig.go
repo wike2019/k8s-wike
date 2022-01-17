@@ -20,19 +20,19 @@ import (
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Rs"
 	"k8sapi/pkg/sa"
-	"k8sapi/pkg/Secret"
+	"k8sapi/pkg/secret"
 	"k8sapi/pkg/Svc"
 	"log"
 )
 
 type K8sConfig struct {
-	DepHandler *Deployment.DepHandler            `inject:"-"`
+	DepHandler *Deployment.DepHandler                        `inject:"-"`
 	PodHandler *Pod.PodHandler                               `inject:"-"`
-	NsHandler *ns.Handler                                    `inject:"-"`
-	EventHandler *Event.EventHandler                         `inject:"-"`
+	NsHandler *ns.NsHandler                                  `inject:"-"`
+	EventHandler *event.EventHandler                         `inject:"-"`
 	IngressHandler *Ingress.IngressHandler                   `inject:"-"`
 	ServiceHandler *Svc.ServiceHandler                       `inject:"-"`
-	SecretHandler *Secret.Handler                            `inject:"-"`
+	SecretHandler *secret.SecretHandler                            `inject:"-"`
 	ConfigMapHandler *ConfigMap.ConfigMapHandler             `inject:"-"`
 	NodeHandler *Node.NodeMapHandler                         `inject:"-"`
 	RoleHander *Rbac.RoleHander                              `inject:"-"`

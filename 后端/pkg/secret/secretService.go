@@ -1,4 +1,4 @@
-package Secret
+package secret
 
 import (
 	"context"
@@ -10,19 +10,18 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8sapi/pkg/helper"
 )
-//@Service
-//@service
-type Service struct {
+
+type SecretService struct {
 	Client *kubernetes.Clientset `inject:"-"`
-	Map *MapStruct               `inject:"-"`
+	Map *SecretMapStruct               `inject:"-"`
 	Helper *helper.Helper        `inject:"-"` //帮助函数 用于分页
 }
-func NewSecretService() *Service {
-	return &Service{}
+func NewSecretService() *SecretService {
+	return &SecretService{}
 }
 
-//对外方法，根据分页取dep列表
-func(this *Service) PageDeps(ns string,page,size int ) *helper.ItemsPage {
+
+func(this *SecretService) PageDeps(ns string,page int) *helper.ItemsPage {
 	SecretList:=this.Map.ListAll(ns)
 	SecretCovert:=make([]interface{},len(SecretList))
 	for i,dep:=range SecretList{
@@ -30,32 +29,32 @@ func(this *Service) PageDeps(ns string,page,size int ) *helper.ItemsPage {
 	}
 	return this.Helper.PageResource(
 		page, //当前页
-		size, //尺寸默认5
+		10,
 		SecretCovert,//全部数据集合，会自动筛选出分页里面的内容
 	).SetExt(gin.H{
 		"ns":ns, //命名空间
 	})
 }
-func(this *Service) All(ns string )[]*SecretModel{
+func(this *SecretService) All(ns string )[]*SecretModel{
 	return this.Map.ListAll(ns)
 }
 
-//DELETE /ingress?ns=xx&name=xx
-func(this *Service) GetSecret(ns,name string) SecretModel{
+
+func(this *SecretService) GetSecret(ns,name string) SecretModel{
 	return this.Map.GetSecret(ns,name)
 }
 
-//Get /ingress?ns=xx&name=xx
-func(this *Service) DelSecret(ns,name string) error{
+
+func(this *SecretService) DelSecret(ns,name string) error{
 	return this.Client.CoreV1().Secrets(ns).
 		Delete(context.Background(),name,v1.DeleteOptions{})
 }
-func (this *Service)  encodeDockerConfigFieldAuth(username, password string) string {
+func (this *SecretService)  encodeDockerConfigFieldAuth(username, password string) string {
 	fieldValue := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(fieldValue))
 }
 
-func (this *Service)  handleDockerCfgJSONContent(username, password, email, server string) (string, error) {
+func (this *SecretService)  handleDockerCfgJSONContent(username, password, email, server string) (string, error) {
 	dockerConfigAuth := DockerConfigEntry{
 		Username: username,
 		Password: password,
@@ -68,7 +67,7 @@ func (this *Service)  handleDockerCfgJSONContent(username, password, email, serv
 	data,err:=json.Marshal(dockerConfigJSON)
 	return string(data),err
 }
-func(this *Service) PostSecret(postModel *corev1.Secret) error{
+func(this *SecretService) PostSecret(postModel *corev1.Secret) error{
 	data :=make(map[string]string)
 	if postModel.Type=="kubernetes.io/dockercfg"{
 		username:=postModel.StringData["username"]
@@ -104,7 +103,7 @@ func(this *Service) PostSecret(postModel *corev1.Secret) error{
 	return err
 
 }
-func(this *Service) UpdateSecret(postModel *corev1.Secret) error{
+func(this *SecretService) UpdateSecret(postModel *corev1.Secret) error{
 	_,err:=this.Client.CoreV1().Secrets(postModel.Namespace).Update(
 		context.Background(),
 		postModel,

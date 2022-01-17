@@ -23,6 +23,7 @@
             WIKE K8S 可视化管理系统-基于vue3
             <a href="https://github.com/wike2019/k8s-wike">项目github地址</a>
             <span>项目作者 wike 联系qq 200569525</span>
+            <strong><a href="https://wike2019.github.io/wike-blog/k8s/">k8s学习教程 (点击进入)</a></strong>
             <a v-if="isLogin" @click="quit" class="quit">退出登陆</a>
           </header>
           <router-view></router-view>

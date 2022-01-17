@@ -1,5 +1,5 @@
 <template>
-    <div class="inline-title">
+    <div class="inline-title-no" v-if="!render">
       <span>注解数据设置</span>         <el-button type="primary" size="small" class="leftBtn" @click="addItem" >添加注释</el-button>
     </div>
     <div v-if="type=='ingress'">
@@ -10,19 +10,24 @@
       </div>
       <el-divider></el-divider>
     </div>
+    <div class="inline-title-no-back" v-if="render">
+      <span>注解数据</span>
+    </div>
     <labelValue @input="getData($event,'annotations',form)" :value="form.annotations" ref="MyLabelRef" :label="true"></labelValue>
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, ref, toRefs, watch} from 'vue'
+import {defineComponent, inject, reactive, ref, toRefs, watch} from 'vue'
 import labelValue from "@/components/labelValue/labelValue.vue"
 import {arrToMap, getData, MapToArr,IsDirty} from "@/helper/helper";
+import {hasValues} from "../../helper/helper";
 export default defineComponent({
   components:{labelValue},
   name: 'annotations',
   emits:["input"],
   props:['type',"value"],
   setup(props,{emit}){
+    const render = inject("render")
     let MyLabelRef=ref(null)
     let state=reactive({
       enable_cors:false,
@@ -31,7 +36,11 @@ export default defineComponent({
       md5:"",
       form:{
         annotations:[]
-      }
+      },
+      defaultData:{
+        annotations:[]
+      },
+      render:render
     })
     let data=[
       {
@@ -89,13 +98,16 @@ export default defineComponent({
     },{deep:true,flush:"post"})
     function AddTitle(list){
       for (let i=0;i<list.length;i++){
+
         for (let j=0;j<data.length;j++){
            if(list[i].key==data[j].key){
              list[i].name=data[j].name
+             state.enable_cors=true
            }
         }
         if(list[i].key=="nginx.ingress.kubernetes.io/rewrite-target"){
           list[i].name="重写规则"
+          state.enable_rewriter=true
         }
       }
       return list
@@ -135,16 +147,14 @@ export default defineComponent({
       emit("input",arrToMap(state.form.annotations))
     }
     watch(()=>props.value,()=>{
-      if(props.value){
-        state.form.annotations=AddTitle(MapToArr(props.value))
-      }else{
-        state.md5=""
+
+      if(!hasValues(props.value)){
         state.form.annotations=[]
       }
-
+      state.form.annotations=AddTitle(MapToArr(props.value))
     })
     watch(()=>state.form,()=>{
-      if(IsDirty(state,4)){
+      if(IsDirty(state,{annotations:AddTitle(MapToArr(props.value))},false,3)){
         return
       }
      commit()

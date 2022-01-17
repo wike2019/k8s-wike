@@ -76,7 +76,6 @@ func(this *SaCtl) create(c *gin.Context) goft.Json{
 func(this *SaCtl) update(c *gin.Context) goft.Json{
 	ServiceAccount:=&corev1.ServiceAccount{} //原生的k8s ServiceAccount 对象
 	goft.Error(c.ShouldBindJSON(ServiceAccount))
-	fmt.Println(ServiceAccount)
 	_,err:=this.Client.CoreV1().ServiceAccounts(ServiceAccount.Namespace).Update(c,ServiceAccount,metav1.UpdateOptions{})
 	goft.Error(err)
 	return gin.H{

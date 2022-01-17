@@ -1,4 +1,4 @@
-package Event
+package event
 
 import (
 	"fmt"
@@ -15,14 +15,11 @@ type EventMapStruct struct {
 	data sync.Map   // [key string] *v1.Event
 	// key=>namespace+"_"+kind+"_"+name 这里的name 不一定是pod ,这样确保唯一
 }
-func(this *EventMapStruct) GetMessage(ns string,kind string,name string) []string{
-	key:=fmt.Sprintf("%s_%s_%s",ns,kind,name)
-	result:=make([]string,0)
+func(this *EventMapStruct) GetMessage(ns string,kind string,name string,uid string)[]*corev1.Event{
+	key:=fmt.Sprintf("%s_%s_%s_%s",ns,kind,name,uid)
 	if v,ok:=this.data.Load(key);ok{
-		for _,value:=range v.([]*corev1.Event) {
-			result=append(result,value.Message)
-		}
+		return v.([]*corev1.Event)
 	}
-	return result
+	return []*corev1.Event{}
 }
 

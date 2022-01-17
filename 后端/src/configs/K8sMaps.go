@@ -13,7 +13,7 @@ import (
 	"k8sapi/pkg/Rbac"
 	"k8sapi/pkg/Rs"
 	"k8sapi/pkg/sa"
-	"k8sapi/pkg/Secret"
+	"k8sapi/pkg/secret"
 	"k8sapi/pkg/Svc"
 )
 
@@ -35,13 +35,13 @@ func(this *K8sMaps) InitPodMap() *Pod.PodMapStruct{
 
 
 //初始化 nsmap
-func(this *K8sMaps) InitNsMap() *ns.MapStruct{
-	return &ns.MapStruct{}
+func(this *K8sMaps) InitNsMap() *ns.NsMapStruct{
+	return &ns.NsMapStruct{}
 }
 
 //初始化 eventmap
-func(this *K8sMaps) InitEventMap() *Event.EventMapStruct{
-	return &Event.EventMapStruct{}
+func(this *K8sMaps) InitEventMap() *event.EventMapStruct{
+	return &event.EventMapStruct{}
 }
 
 
@@ -54,9 +54,9 @@ func(this *K8sMaps) InitServiceMap() *Svc.ServiceMapStruct{
 	return &Svc.ServiceMapStruct{}
 }
 
-//初始化 Secret map
-func(this *K8sMaps) InitSecretMap() *Secret.MapStruct{
-	return &Secret.MapStruct{}
+//初始化 secret map
+func(this *K8sMaps) InitSecretMap() *secret.SecretMapStruct{
+	return &secret.SecretMapStruct{}
 }
 
 
