@@ -7,11 +7,7 @@
     </main>
 </template>
 
-<script lang="ts">
-import { ref, defineComponent } from 'vue'
+<script lang="ts" setup>
 import commonNav from "@/components/common/commonNav.vue";
-export default defineComponent({
-  name: 'main-layout',
-  components: {commonNav},
-})
+
 </script>

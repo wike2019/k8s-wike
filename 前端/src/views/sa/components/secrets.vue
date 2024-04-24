@@ -2,20 +2,19 @@
            <el-card class="box-card" v-if="!render">
              <template #header>
                <div class="card-header mtb20" >
-                 <span class="title">添加密文-{{secretsType}}</span>
+                 <span class="title">添加密文-{{state.secretsType}}</span>
                  <el-button type="primary" size="small" class="leftBtn"  @click="addItem" >添加密文</el-button>
                </div>
              </template>
-             <el-form   :model="form" ref="formRef"  >
-             <div v-for="(item,index) in form.secrets" :key="secretsType+'secrets'+index" class="mtb20">
+             <el-form   :model="state.form" ref="formRef"  >
+             <div v-for="(item,index) in state.form" :key="secretsType+'secrets'+index" class="mtb20">
                  <el-form-item
                      label="密文名称"
                      :key="secretsType+'secrets'+index+'name'"
                      :prop="'secrets.'+index+'.name'"
-                     :rules="[requireRules(tipTitle+'密文名称必须填写'),inArrayWithMsg(secretCheck,tipTitle+'密文名称不合法')]"
                  >
                    <el-select  size="small" v-model="item.name"  filterable>
-                     <el-option :key="key" v-for="(item,key) in secretList" :label="item.name" :value="item.name"/>
+                     <el-option :key="key" v-for="(item,key) in secretCheck" :label="item" :value="item"/>
                    </el-select>
                  </el-form-item>
                  <el-form-item  >
@@ -24,16 +23,16 @@
              </div>
              </el-form>
            </el-card>
-          <div  v-if="render&&form.secrets.length">
+          <div  v-if="render&&state.form?.length">
             <el-descriptions
                 class="smallTable"
 
                 :column="1"
-                :title="secretsType"
+                :title="state.secretsType"
             >
-              <el-descriptions-item v-for="item in form.secrets" :label="tipTitle+':密文名称'">
+              <el-descriptions-item v-for="item in state.form" :label="tipTitle+':密文名称'">
                 {{item.name}}
-                <a  @click="()=>doTo('secret-detail',{namespace:namespace,name:item.name})">查看密文详情</a>
+                <a  @click="()=>doTo('secret-detail',{namespace:state.namespace,name:item.name})">查看密文详情</a>
               </el-descriptions-item>
             </el-descriptions>
             <el-divider></el-divider>
@@ -42,91 +41,92 @@
 </template>
 
 
-<script lang="ts">
+<script lang="ts" setup>
 import {computed, defineComponent, inject, reactive, ref, toRefs, watch} from 'vue'
-import {IsDirty} from "@/helper/helper";
-import {requireRules, NameToArr, inArrayWithMsg} from "../../../helper/rules";
+import {IsDirty} from "../../../helper/helper";
+import {requireRules, NameToArr, inArrayWithMsg, NameToArrWithKey} from "../../../helper/rules";
 import {secretAllByNs} from "../../../api/token/secret/secret";
 import {doTo} from "../../../router";
-export default defineComponent({
-  name: 'LabelValue',
-  emits:["input"],
-  props:["value","namespace","secretsType",'tipTitle'],
-  setup(props,{emit}){
-    const render = inject("render")
-    let state=reactive({
-      secretList:[],
-      tipTitle:props.tipTitle,
-      form:{
-        secrets:[]
-      },
-      defaultData:{
-        secrets:[]
-      },
-      md5:"",
-      namespace:"default",
-      secretsType:props.secretsType,
-      render:render
-    })
-    let formRef=ref(null)
-    function commit(){
-        emit("input",state.form.secrets)
-    }
-    async function  fetchData(){
-      let secret=await  secretAllByNs(props.namespace)
-      state.secretList=secret.data.data.filter(item=>{
-         if(state.tipTitle=='secrets'){
-           if (item.type=="服务账号令牌"){
-             return true
-           }else{
-             return  false
-           }
-         }
-        if(state.tipTitle=='imagePullSecrets'){
-          if (item.type=="docker配置"||item.type=="docker配置(JSON)"){
-            return true
-          }else{
-            return  false
-          }
-        }
-      })
-    }
-    watch(()=>props.namespace,async ()=>{
-      state.namespace=props.namespace
-      await fetchData()
-    })
-    fetchData()
-    watch(()=>state.form,()=>{
-      if(IsDirty(state,{secrets:props.value})){
-        return
-      }
-      commit()
-    },{deep:true,flush:"post"})
+const render = inject("render")
+const props = defineProps(['tipTitle',"namespace","secretsType"])
 
-    watch(()=>props.value,()=>{
-       state.form=Object.assign({},state.defaultData,{secrets:props.value})
-    },{deep:true,flush:"post"})
-
-    function Check(){
-      formRef.value.validate()
-    }
-    function removeItem(index) {
-      state.form.secrets.splice(index,1)
-    }
-    function addItem() {
-      if( state.form.secrets){
-        state.form.secrets.push({name:""})
-      }else{
-        state.form.secrets=[{name:""}]
-      }
-
-    }
-    let secretCheck=computed(()=> {
-      return NameToArr(state.secretList)
-    })
-    return {removeItem,addItem,...toRefs(state),Check,formRef,requireRules,inArrayWithMsg,secretCheck,doTo}
-  }
+let state=reactive({
+  secretList:[],
+  tipTitle:props.tipTitle,
+  form: [],
+  md5:"",
+  namespace:"default",
+  secretsType:props.secretsType,
+  render:render
 })
+let formRef=ref(null)
+const emit = defineEmits(['input'])
+
+function commit(){
+  emit("input",state.form)
+}
+async function  fetchData(){
+  let secret=await  secretAllByNs(state.namespace)
+  state.form=[]
+  state.secretList=secret.data.data.filter(item=>{
+    if(state.tipTitle=='secrets'){
+
+      if (item.type=="服务账号令牌"){
+        return true
+      }else{
+        return  false
+      }
+    }
+    if(state.tipTitle=='imagePullSecrets'){
+      if (item.type=="docker配置"||item.type=="docker配置(JSON)"){
+        return true
+      }else{
+        return  false
+      }
+    }
+  })
+}
+watch(()=>props.namespace,async ()=>{
+if (!props.namespace){
+  return
+}
+  state.namespace=props.namespace
+  await fetchData()
+},{deep:true,flush:"post"})
+fetchData()
+watch(()=>state.form,()=>{
+  if(!IsDirty(state)){
+    commit()
+    return
+  }
+
+},{deep:true,flush:"post"})
+
+
+
+function Check(){
+  return formRef.value.validate()
+}
+function removeItem(index) {
+  state.form.splice(index,1)
+}
+function addItem() {
+  if( state.form.length>0){
+    state.form.push({name:""})
+  }else{
+    state.form=[{name:""}]
+  }
+
+}
+let secretCheck=computed(()=> {
+  return NameToArrWithKey(state.secretList,"Secret")
+})
+function setData(data){
+  if (data){
+    state.form=data
+  }
+}
+defineExpose({ setData,Check })
 </script>
 
 <style scoped>

@@ -10,7 +10,7 @@
         <el-menu-item-group title="命名空间">
           <el-menu-item index="1-1"  @click="doTo('ns-list')">
             <i class="fa fa-bandcamp" aria-hidden="true"></i>
-            <span>命名空间</span>
+            <span>命名空间（已完成）</span>
           </el-menu-item>
         </el-menu-item-group>
         <el-menu-item-group title="Pod管理">
@@ -26,8 +26,8 @@
           <span>服务账号</span>
         </template>
         <el-menu-item-group title="服务账号相关">
-          <el-menu-item @click="doTo('sa-create')" index="2-1"><i class="fa fa-linode" aria-hidden="true"></i><span>SA创建</span></el-menu-item>
-          <el-menu-item @click="doTo('sa-list')"  index="2-2"><i class="fa fa-quora" aria-hidden="true"></i><span>SA列表</span></el-menu-item>
+          <el-menu-item @click="doTo('sa-create')" index="2-1"><i class="fa fa-linode" aria-hidden="true"></i><span>SA创建 （已完成）</span></el-menu-item>
+          <el-menu-item @click="doTo('sa-list')"  index="2-2"><i class="fa fa-quora" aria-hidden="true"></i><span>SA列表 （已完成）</span></el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
       <el-sub-menu index="3">
@@ -37,9 +37,9 @@
         </template>
         <el-menu-item-group title="密文相关">
           <el-menu-item @click="doTo('secret-create')" index="3-1"><i class="fa fa-address-card-o" aria-hidden="true"></i>
-            <span>Secret创建</span></el-menu-item>
+            <span>Secret创建（已完成）</span></el-menu-item>
           <el-menu-item @click="doTo('secret-list')"  index="3-2"><i class="fa fa-bath" aria-hidden="true"></i>
-            <span>Secret列表</span></el-menu-item>
+            <span>Secret列表 （已完成）</span></el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
       <el-sub-menu index="4">
@@ -49,9 +49,9 @@
         </template>
         <el-menu-item-group title="configmap相关">
           <el-menu-item @click="doTo('configmap-create')" index="4-1"><i class="fa fa-eercast" aria-hidden="true"></i>
-            <span>ConfigMap创建</span></el-menu-item>
+            <span>ConfigMap创建 （已完成）</span></el-menu-item>
           <el-menu-item @click="doTo('configmap-list')"  index="4-2"><i class="fa fa-free-code-camp" aria-hidden="true"></i>
-            <span>ConfigMap列表</span></el-menu-item>
+            <span>ConfigMap列表 （已完成）</span></el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
       <el-sub-menu index="5">
@@ -62,9 +62,9 @@
         <el-menu-item-group title="ingress相关">
           <el-menu-item @click="doTo('ingress-create')" index="5-1">
             <i class="fa fa-ravelry" aria-hidden="true"></i>
-            <span>Ingress创建</span></el-menu-item>
+            <span>Ingress创建（进行中）</span></el-menu-item>
           <el-menu-item @click="doTo('ingress-list')"  index="5-2"><i class="fa fa-superpowers" aria-hidden="true"></i>
-            <span>Ingress列表</span></el-menu-item>
+            <span>Ingress列表 （已完成）</span></el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
       <el-sub-menu index="6">
@@ -73,8 +73,8 @@
           <span>svc</span>
         </template>
         <el-menu-item-group title="svc相关">
-          <el-menu-item @click="doTo('svc-create')" index="5-1"><i class="fa fa-th-list" aria-hidden="true"></i><span>svc创建</span></el-menu-item>
-          <el-menu-item @click="doTo('svc-list')"  index="5-2"><i class="fa fa-th-list" aria-hidden="true"></i><span>svc列表</span></el-menu-item>
+          <el-menu-item @click="doTo('svc-create')" index="6-1"><i class="fa fa-th-list" aria-hidden="true"></i><span>svc创建 （已完成）</span></el-menu-item>
+          <el-menu-item @click="doTo('svc-list')"  index="6-2"><i class="fa fa-th-list" aria-hidden="true"></i><span>svc列表 （已完成）</span></el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
       <el-sub-menu index="4">
@@ -85,16 +85,6 @@
         <el-menu-item-group title="Deployment相关">
           <el-menu-item @click="doTo('deploy-create')" index="4-1"><i class="fa fa-wrench" aria-hidden="true"></i><span>创建</span></el-menu-item>
           <el-menu-item @click="doTo('deployment-list')"  index="4-2"><i class="fa fa-th-list" aria-hidden="true"></i><span>列表</span></el-menu-item>
-        </el-menu-item-group>
-      </el-sub-menu>
-      <el-sub-menu index="5">
-        <template #title>
-          <i class="fa fa-question-circle" aria-hidden="true"></i>
-          <span>nginx-ingress</span>
-        </template>
-        <el-menu-item-group title="Ingress相关">
-          <el-menu-item index="5-1"  @click="doTo('ingress-create')"><i class="fa fa-wrench" aria-hidden="true"></i><span>创建</span></el-menu-item>
-          <el-menu-item index="5-2"  @click="doTo('ingress-list')"><i class="fa fa-th-list" aria-hidden="true"></i><span>列表</span></el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
       <el-sub-menu index="6">

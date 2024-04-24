@@ -1,4 +1,4 @@
-  export const API="http://localhost:7772"
-  export const WSAPI="ws://127.0.0.1:7772"
+  export const API="http://k8s-api.ng2-oa.com"
+  export const WSAPI="ws://k8s-api.ng2-oa.com"
  // export const API=""
  // export const WSAPI="ws://"+location.host;

@@ -5,7 +5,7 @@
       <nsSelect @input="(e)=>{changeNs(e)}" url="sa-create" btn="创建ServiceAccount"></nsSelect>
       <el-divider></el-divider>
        <el-table
-              :data="List"
+              :data="state.List"
               border
               empty-text="暂无数据"
               style="width: 100%">
@@ -13,7 +13,7 @@
        <el-table-column label="服务账号名称" >
          <template #default="scope">
            <p  @click="()=>doTo('sa-detail',rowToQuery(scope.row))"  >
-             {{ scope.row.name }}
+             {{ scope.row.metadata.name }}
              <a style="margin-left:25px" v-for="item in scope.row.secrets" @click.stop="showToken(item.name)">
                查看{{item.name}}
              </a>
@@ -22,12 +22,12 @@
        </el-table-column>
        <el-table-column label="命名空间" width="180" align="center">
          <template #default="scope">
-           <span>{{ scope.row.namespace }}</span>
+           <span>{{ scope.row.metadata.namespace }}</span>
          </template>
        </el-table-column>
        <el-table-column label="创建时间" width="200" align="center">
          <template #default="scope">
-           <span>{{ scope.row.createTime }}</span>
+           <span>{{ scope.row.metadata.creationTimestamp }}</span>
          </template>
        </el-table-column>
        <el-table-column label="操作" width="300" align="center">
@@ -52,99 +52,93 @@
          <el-pagination
              @current-change="pageChange"
              background
-             :current-page="currentPage"
+             :current-page="state.currentPage"
              :page-size="10"
              :hide-on-single-page="true"
              layout="prev, pager, next"
-             :total="pageTotal">
+             :total="state.pageTotal">
          </el-pagination>
        </div>
      </div>
    </main-layout>
 
   <el-dialog
-      v-model="dialogVisible"
-      v-if="dialogVisible"
+      v-model="state.dialogVisible"
+      v-if="state.dialogVisible"
       title="token"
   >
-    <div style="line-height:1.5">{{token}}</div>
+    <div  class="break">{{state.token}}</div>
     <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">关闭</el-button>
+          <el-button @click="state.dialogVisible = false">关闭</el-button>
         </span>
     </template>
   </el-dialog>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {defineComponent, inject, reactive, ref, toRefs} from 'vue'
 import MainLayout from "@/layout/main.vue";
-import {doTo} from "@/router";
-import {getSaList, SaDel} from "@/api/token/sa/sa";
-import {secretDetail} from "@/api/token/secret/secret";
+import {doTo} from "../../router";
+import {getSaList, SaDel} from "../../api/token/sa/sa";
+import {secretDetail} from "../../api/token/secret/secret";
 import nsSelect from "@/components/common/nsSelect.vue";
 import breadcrumb from "@/components/common/breadcrumb.vue";
-import {rowToQuery,copyData,wsCopyData,rmTip,showError} from "@/helper/helper";
+import {rowToQuery,copyData,wsCopyData,rmTip,showError} from "../../helper/helper";
+import {ElMessage} from "element-plus";
 
-export default defineComponent({
-  name: 'sa-list',
-  components: {MainLayout,nsSelect,breadcrumb},
-  setup(){
-    const ws = inject("ws")
-    let state=reactive({
-      List:[],
-      namespace:"default",
-      dialogVisible:false,
-      token:'',
-      pageTotal:0,
-      currentPage:1,
-    })
+const ws: WebSocket = inject("ws")
+let state=reactive({
+  namespace:"default",
+  dialogVisible:false,
+  token:'',
+  List: [],
+  pageTotal:0,
+  currentPage:1,
+})
 
-    async function changeNs(ns){
-      state.namespace=ns
-      try {
-          let tData=await getSaList(state.namespace,state.currentPage)
-          copyData(state,tData)
-        }catch (e){
+async function changeNs(ns){
+  state.namespace=ns
+  try {
+    let tData=await getSaList(state.namespace,state.currentPage)
+    copyData(state,tData)
+  }catch (e){
+    console.log(e)
+  }
+}
+changeNs(state.namespace)
+ws.onmessage = (e)=>{
+  if(e.data !== 'ping'){
+    let tData=JSON.parse(e.data)
+    wsCopyData(state,tData,"sa")
+  }
+}
+
+function rm(ns,name){
+  rmTip('ServiceAccount')
+      .then(async () => {
+        try {
+          await SaDel(ns,name)
+        }catch (e) {
           console.log(e)
         }
-    }
-    changeNs(state.namespace)
-    ws.onmessage = (e)=>{
-      if(e.data !== 'ping'){
-        let tData=JSON.parse(e.data)
-        wsCopyData(state,tData,"sa")
-      }
-    }
-
-    function rm(ns,name){
-        rmTip('ServiceAccount')
-          .then(async () => {
-              try {
-                await SaDel(ns,name)
-              }catch (e) {
-                console.log(e)
-              }
-          })
-    }
-    async function showToken(name){
-      try {
-      let result=await secretDetail(state.namespace,name)
-          let token=window.atob(result.data.data.data['token'])
-          state.token=token;
-          state.dialogVisible=true;
-      }catch (e) {
-        console.log(e)
-        showError("该数据没有合法token")
-      }
-
-    }
-    function pageChange(page){
-      state.currentPage=page
-      changeNs(state.namespace)
-    }
-
-    return {...toRefs(state),rm,changeNs,doTo,showToken,pageChange,rowToQuery}
+      })
+}
+async function showToken(name){
+  try {
+    let result=await secretDetail(state.namespace,name)
+    let token=window.atob(result.data.data.Secret.data['token'])
+    state.token=token;
+    state.dialogVisible=true;
+  }catch (e) {
+    console.log(e)
+    ElMessage.error("该数据没有合法token")
   }
-})
+
+}
+function pageChange(page){
+  state.currentPage=page
+  changeNs(state.namespace)
+}
+
 </script>

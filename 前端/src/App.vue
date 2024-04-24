@@ -20,51 +20,28 @@
 
       <div v-if="init">
           <header class="header_all">
-            WIKE K8S 可视化管理系统-基于vue3
+            WIKE K8S 可视化管理系统-基于vue3 （内网穿透出来的网络比较慢）
             <a href="https://github.com/wike2019/k8s-wike">项目github地址</a>
             <span>项目作者 wike 联系qq 200569525</span>
-            <strong><a href="https://wike2019.github.io/wike-blog/k8s/">k8s学习教程 (点击进入)</a></strong>
-            <a v-if="isLogin" @click="quit" class="quit">退出登陆</a>
           </header>
           <router-view></router-view>
           <footer></footer>
       </div>
 </template>
 
-<script lang="ts">
-import {defineComponent, onUnmounted,onMounted, provide, ref} from 'vue'
-import {doTo} from "./router";
-import {core} from "./core/core";
+<script lang="ts" setup>
+import {onUnmounted,onMounted, provide, ref} from 'vue'
 import {WSAPI} from "./config/api";
-export default defineComponent({
-  name: 'App',
-  setup(){
     let ws= new WebSocket(WSAPI+"/v1/ws");
-    let isLogin=ref(false);
     let init=ref(false)
     provide("ws",ws)
     provide("rootPath",WSAPI)
-    core.bus.on('login',function (){
-      isLogin.value=true;
-    })
-    if(localStorage.getItem("token")){
-      isLogin.value=true;
-    }
-    function quit(){
-      localStorage.removeItem("token")
-      isLogin.value=false;
-      doTo("login")
-    }
     onUnmounted(()=>{
       ws.close()
     })
     onMounted(()=>{
 
     })
-
-    return {isLogin,quit,init}
-  }
-})
 </script>
 
 <style scoped   lang="less">

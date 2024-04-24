@@ -1,50 +1,17 @@
 <template>
    <main-layout class="fix-black">
-     <nav class="nav-bar">
-          <el-breadcrumb separator="/">
-             <el-breadcrumb-item>密文详情</el-breadcrumb-item>
-          </el-breadcrumb>
-     </nav>
+     <breadcrumb title="密文.详情"></breadcrumb>
      <div class="list_item">
-       <p>
-         账号服务名称: {{secretData.name}}
-       </p>
-       <p>
-         命名空间: {{secretData.namespace}}
-       </p>
-       <p>
-         创建时间: {{secretData.create_time}}
-       </p>
+       <metadataInfo  ref="mateDataRef" tipTitle="Secret" :nameDisable="true" :nameRequired="true"></metadataInfo>
        <el-divider></el-divider>
-       <h3>标签</h3>
-       <div v-if="secretData.labels">
-         <p v-for="(value,key) in secretData.labels">
-           <strong>{{key}}</strong><em>:</em><span>{{value}}</span>
-         </p>
-       </div>
-       <div v-else>
-         无数据
-       </div>
-       <h3>注释</h3>
-       <div v-if="secretData.annotations">
-         <p v-for="(value,key) in secretData.annotations">
-           <strong>{{key}}</strong><em>:</em><span>{{value}}</span>
-         </p>
-       </div>
-       <div v-else>
-         无数据
-       </div>
-       <el-divider></el-divider>
-       <div v-if="secretData.type=='TLS凭据'" >
-           <p v-for="(data,item) in secretData.tls_data">
+       <div v-if="state.secretData.type=='TLS凭据'" >
+           <p v-for="(data,item) in state.secretData.tls_data">
              <span class="key_format"  style="padding-left:15px">{{item}}:</span>
              <span class="value_format">{{data}}</span>
-             <el-divider></el-divider>
            </p>
-
+           <el-divider></el-divider>
        </div>
-
-       <h2 class="sub_title">Data</h2>
+       <h2 class="sub_title">配置数据Data</h2>
        <el-table
            :data="data"
            border
@@ -56,78 +23,61 @@
               {{ scope.row.key }}
            </template>
          </el-table-column>
-         <el-table-column label="密文value(长按显示解密后的值)"   >
+         <el-table-column label="密文value(长按显示解密后的值)"  align="left"  >
            <template #default="scope">
-             <div @mousedown="()=>scope.row.show=true" @mouseup="()=>scope.row.show=false">
-               <p v-if="!scope.row.show">
-                 {{ scope.row.value }}
-               </p>
-               <p v-else>
-                 {{ scope.row.raw }}
-               </p>
+             <div @mousedown="()=>scope.row.show=true" @mouseup="()=>scope.row.show=false" >
+               <div v-if="!scope.row.show" class="break-all">{{ scope.row.value }}</div>
+               <div v-else class="break-all" >{{ scope.row.raw }}</div>
              </div>
            </template>
          </el-table-column>
        </el-table>
        <el-divider></el-divider>
-       <el-button class="mtb20" type="primary" @click="()=>doTo('secret-update',{namespace:namespace,name:name})" >
+       <el-button class="mtb20" type="primary" @click="()=>doTo('secret-update',{namespace:state.namespace,name:state.name})" >
          编辑
        </el-button>
      </div>
    </main-layout>
 </template>
 
-<script lang="ts">
-import {defineComponent, computed, ref, onUnmounted, inject, reactive,toRefs} from 'vue'
-import { ElMessageBox, ElMessage } from 'element-plus'
+<script lang="ts" setup>
+import {computed, provide, reactive, ref} from 'vue'
+import breadcrumb from "../../components/common/breadcrumb.vue";
+import metadataInfo from "../../components/metadataInfo/metadataInfo.vue";
 import MainLayout from "../../layout/main.vue";
-import {getNsList} from "../../api/token/namespace/ns";
-import {ingressDel, ingressListByNs} from "../../api/token/ingress/ingress";
-import {secretDel, secretDetail, secretListByNs} from "../../api/token/secret/secret";
+import { secretDetail} from "../../api/token/secret/secret";
 import {useRoute} from "vue-router";
 import {doTo} from "../../router";
-export default defineComponent({
-  name: 'secret-detail',
-  components: {MainLayout},
-  setup(){
 
-    let state=reactive({
-      namespace:"",
-      name:"",
-      secretData:reactive({data:{},string_data:{}}),
-    })
-    let data=computed(()=>{
-      let arr=[];
-      for ( let i in state.secretData.data){
-        arr.push({"show":false,"key":i,value:state.secretData.data[i],raw:decodeURIComponent(atob(state.secretData.data[i]))})
-      }
-      return arr
-    })
-    let string_data=computed(()=>{
-      let arr=[];
-      for ( let i in state.secretData.string_data){
-        arr.push({"show":false,"key":i,value:state.secretData.data[i],raw:decodeURIComponent(atob(state.secretData.data[i]))})
-      }
-      return arr
-    })
-    async function getData(){
-      const route = useRoute()
-      try {
-        state.namespace=route.query.namespace
-        state.name=route.query.name
-       let tData=await secretDetail(state.namespace,state.name)
-        state.secretData=tData.data.data
-      }catch (e){
-        console.log(e)
-      }
-    }
-    getData()
-    return {...toRefs(state),data,string_data,doTo}
-  }
+import {ElMessage} from "element-plus";
+
+
+let mateDataRef=ref(null)
+
+let state=reactive({
+  namespace:"",
+  name:"",
+  secretData:{Secret:{metadata:{},data:{}}},
 })
-</script>
-<style >
-.fix-black .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner {
-  background-color:#555;
+let data=computed(()=>{
+  let arr=[];
+  for ( let i in state.secretData?.Secret.data){
+    arr.push({"show":false,"key":i,value:state.secretData.Secret.data[i],raw:decodeURIComponent(atob(state.secretData.Secret.data[i]))})
+  }
+  return arr
+})
+provide("render",true)
+async function getData(){
+  const route = useRoute()
+  try {
+    state.namespace=route.query.namespace.toString()
+    state.name=route.query.name.toString()
+    let tData=await secretDetail(state.namespace,state.name)
+    state.secretData=tData.data.data
+    mateDataRef.value.setData(state.secretData.Secret.metadata)
+  }catch (e){
+    ElMessage.error(e)
+  }
 }
-</style>
+getData()
+</script>

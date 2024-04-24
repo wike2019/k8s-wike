@@ -1,0 +1,6 @@
+p, guest, /api/v1/ws, GET
+p, admin, /api/v1/ns, DELETE
+p, guest, /api/v1/ns, GET
+p, guest, /api/v1/ns, POST
+g, admin, guest
+g, wike, admin

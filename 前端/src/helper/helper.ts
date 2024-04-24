@@ -1,12 +1,17 @@
 import {ElLoading, ElMessage, ElMessageBox} from "element-plus";
 import md5 from "js-md5";
-import {nextTick} from "vue";
 import {checkYaml} from "./rules";
 
-export  function getData(data,keys,obj,doDelete){
+export  function getData(data,keys,obj,doDelete,emit,key){
     let arr=keys.split('.')
     for (let i =0;i<arr.length-1;i++){
         obj=obj[arr[i]]
+    }
+    if (keys=="tls.crt"){
+        arr=["tls.crt"]
+    }
+    if (keys=="tls.key"){
+        arr=["tls.key"]
     }
 
     if( hasValues(data)){
@@ -17,6 +22,16 @@ export  function getData(data,keys,obj,doDelete){
         }
 
     }
+    if (emit){
+        if(key){
+            emit("input",obj[key])
+        }else {
+            emit("input",obj)
+        }
+
+    }
+
+
 }
 
 export  function hasValues(data){
@@ -114,15 +129,15 @@ export function arrToMap(input){
     }
     return obj;
 }
-export function MapToArr(input){
+export function MapToArr(input,decode=false){
     let arr=[]
     for (let i in input){
-        arr.push({key:i,value:input[i],NoRequired:!!input[i]})
+        arr.push({key:i,value:!decode?input[i]:atob(input[i]),required:true})
     }
     return arr;
 }
 export function  rowToQuery(row){
-    return {namespace:row.namespace,name:row.name}
+    return {namespace:row.metadata.namespace,name:row.metadata.name}
 }
 
 export function copyData(state,tData){
@@ -164,6 +179,9 @@ export  function createTip(){
 }
 function  convert(data){
     let temp
+    if (data===undefined){
+        return ""
+    }
     try {
         temp= JSON.stringify(JSON.parse(JSON.stringify(data)))
     }catch (e) {
@@ -173,42 +191,30 @@ function  convert(data){
 
    return temp
 }
-export function IsDirty(state,props,root,flag){
-
-    if (root){
-        if (state.md5==md5(convert(state.form))){
-            return true
-        }
+export function IsDirty(state){
+    if(convert(state.form)===""){
+        return true
     }
-
-    if (!root){
-        // if (flag==2.2){
-        //     console.error(flag,props,state.form,state.md5,md5(convert(state.form)),md5(convert(props)),root)
-        //     console.warn(state.md5==md5(convert(state.form)),state.md5==md5(convert(props)),"*****")
-        // }
-        if (state.md5==md5(convert(state.form))&&state.md5==md5(convert(props))){
-           // console.log(flag,"不执行更新")
-            return true
-        }
+    if (state.md5==md5(convert(state.form))){
+        return true
     }
-    // if (flag==2.2){
-    //     console.log(flag,"执行更新")
-    // }
-
     state.md5=md5(convert(state.form))
     return  false
 }
 let  loading
 
 
-export  function CheckData(list,num){
+export  function CheckData(list){
     return new Promise(async function (resolve) {
         for (let i = 0; i < list.length; i++) {
             try {
-                await list[i].value.Check()
-                resolve(true)
+                let flag=await list[i].value.Check()
+                if (!flag){
+                    console.log(list[i].value)
+                    resolve(false)
+                }
             } catch (e) {
-                console.log(e)
+                resolve(false)
             }
         }
         resolve(true)
@@ -327,7 +333,4 @@ export  function initFn(yamlRef,nextTick,state){
         })
     }
     return {yamlChange,Update,back,showErr}
-}
-export function deleteOtherInfo(state){
-    delete  state.form.metadata.managedFields
 }

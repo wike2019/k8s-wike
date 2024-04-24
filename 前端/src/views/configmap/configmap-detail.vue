@@ -1,40 +1,8 @@
 <template>
    <main-layout class="fix-black">
-     <nav class="nav-bar">
-          <el-breadcrumb separator="/">
-             <el-breadcrumb-item>密文详情</el-breadcrumb-item>
-          </el-breadcrumb>
-     </nav>
-       <div class="list_item">
-         <p>
-           配置名称: {{configmapData.name}}
-         </p>
-         <p>
-           命名空间: {{configmapData.namespace}}
-         </p>
-         <p>
-           创建时间: {{configmapData.create_time}}
-         </p>
-
-         <el-divider></el-divider>
-       <h3>标签</h3>
-       <div v-if="configmapData.labels">
-         <p v-for="(value,key) in configmapData.labels">
-           <span>{{key}}</span><em>:</em><span>{{value}}</span>
-         </p>
-       </div>
-       <div v-else>
-         无数据
-       </div>
-       <h3>注释</h3>
-       <div v-if="configmapData.annotations">
-         <p v-for="(value,key)  in configmapData.annotations">
-           <span>{{key}}</span><em>:</em><span>{{value}}</span>
-         </p>
-       </div>
-       <div v-else>
-         无数据
-       </div>
+     <breadcrumb title="配置.详情"></breadcrumb>
+     <div class="list_item">
+       <metadataInfo  ref="mateDataRef" tipTitle="ConfigMap" :nameDisable="true" :nameRequired="true"></metadataInfo>
        <el-divider></el-divider>
        <el-table
            :data="data"
@@ -47,64 +15,57 @@
               {{ scope.row.key }}
            </template>
          </el-table-column>
-         <el-table-column label="配置value"   align="center">
+         <el-table-column label="配置value"   align="left">
            <template #default="scope">
-             <div>
-               <p v-if="!scope.row.show">
-                 {{ scope.row.value }}
-               </p>
-             </div>
+               <div class="break-all"  v-if="!scope.row.show" style="word-wrap: break-word;">{{ scope.row.value }}
+               </div>
            </template>
          </el-table-column>
        </el-table>
-         <el-button class="mtb20" type="primary" @click="()=>doTo('configmap-update',{namespace:configmapData.namespace,name:configmapData.name})" >
+       <el-divider></el-divider>
+         <el-button class="mtb20" type="primary" @click="()=>doTo('configmap-update',{namespace:state.namespace,name:state.name})" >
            编辑
          </el-button>
        </div>
    </main-layout>
 </template>
 
-<script lang="ts">
-import {defineComponent, computed, ref, onUnmounted, inject, reactive,toRefs} from 'vue'
+<script lang="ts" setup>
+import { computed, ref,  reactive,provide} from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import MainLayout from "../../layout/main.vue";
-import {getNsList} from "../../api/token/namespace/ns";
-import {ingressDel, ingressListByNs} from "../../api/token/ingress/ingress";
-import {secretDel, secretDetail, secretListByNs} from "../../api/token/secret/secret";
+import breadcrumb from "../../components/common/breadcrumb.vue";
+import metadataInfo from "../../components/metadataInfo/metadataInfo.vue";
 import {useRoute} from "vue-router";
 import {configmapDetail} from "../../api/token/configmap/configmap";
 import {doTo} from "../../router";
-export default defineComponent({
-  name: 'configmap-detail',
-  components: {MainLayout},
-  setup(){
-
-    let state=reactive({
-      configmapData:reactive({}),
-    })
-    let data=computed(()=>{
-      let arr=[];
-      for ( let i in state.configmapData.data){
-        arr.push({"key":i,value:state.configmapData.data[i]})
-      }
-      return arr
-    })
-    async function getData(){
-      const route = useRoute()
-      try {
-       let tData=await configmapDetail(route.query.namespace,route.query.name)
-        state.configmapData=tData.data.data
-      }catch (e){
-        console.log(e)
-      }
-    }
-    getData()
-    return {...toRefs(state),data,doTo}
-  }
+let mateDataRef=ref(null)
+const route = useRoute()
+let state=reactive({
+  namespace:"",name:"",
+  form:reactive({data:{},metadata:{}}),
 })
-</script>
-<style >
-.fix-black .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner {
-  background-color:#555;
+state.name=route.query.name.toString()
+state.namespace=route.query.namespace.toString()
+let data=computed(()=>{
+  let arr=[];
+  for ( let i in state.form.data){
+    arr.push({"key":i,value:state.form.data[i]})
+  }
+  return arr
+})
+async function getData(){
+
+  try {
+    let tData=await configmapDetail(state.namespace,state.name)
+
+    state.form=tData.data.data
+    mateDataRef.value.setData( state.form.metadata)
+  }catch (e){
+    console.log(e)
+  }
 }
-</style>
+getData()
+provide("render",true)
+
+</script>

@@ -1,115 +1,74 @@
 <template>
    <main-layout class="fix-black">
-     <nav class="nav-bar">
-          <el-breadcrumb separator="/">
-             <el-breadcrumb-item>服务账号详情</el-breadcrumb-item>
-          </el-breadcrumb>
-     </nav>
+     <breadcrumb title="服务.详情"></breadcrumb>
      <div class="list_item">
-       <p>
-         账号服务名称: {{item.name}}
-       </p>
-       <p>
-         命名空间: {{item.namespace}}
-       </p>
-       <p>
-       创建时间: {{item.create_time}}
-       </p>
+       <metadataInfo  ref="mateDataRef" tipTitle="Services" :nameDisable="true" :nameRequired="true"></metadataInfo>
        <el-divider></el-divider>
-       <h3>标签</h3>
-       <div v-if="item.labels">
-         <p v-for="(value,key) in item.labels">
-          <strong>{{key}}</strong><em>:</em><span>{{value}}</span>
-         </p>
-       </div>
-       <div v-else>
-         无数据
-       </div>
-       <h3>注释</h3>
-       <div v-if="item.annotations">
-         <p v-for="(value,key) in item.annotations">
-           <strong>{{key}}</strong><em>:</em><span>{{value}}</span>
-         </p>
-       </div>
-       <div v-else>
-         无数据
+       <div>
+         <port ref="portRef" :type="state.form.spec.type"></port>
+         <labelValue ref="selectorRef" label="Selector设置" ></labelValue>
        </div>
        <el-divider></el-divider>
-       <h3>密文列表</h3>
-       <div v-if="item.secrets&&item.secrets.length">
-          <p v-for="secret in item.secrets">
-            密文名称: <a  @click="()=>doTo('secret-detail',{namespace:item.namespace,name:secret.name})">{{secret.name}} 查看密文</a>
-          </p>
-       </div>
-       <div v-else>
-         无数据
-       </div>
-       <el-divider></el-divider>
-       <h3>拉取镜像列表</h3>
-       <div v-if="item.imagePullSecrets&&item.imagePullSecrets.length">
-         <p v-for="imagePullSecret in item.imagePullSecrets">
-           镜像密文名称:<a  @click="()=>doTo('secret-detail',{namespace:item.namespace,name:imagePullSecret.name})">{{imagePullSecret.name}} 查看密文</a>
-         </p>
-       </div>
-       <div v-else>
-           无数据
-       </div>
+       <el-card class="box-card">
+         <el-descriptions
+             :column="1"
+             title="其他数据"
+         >
+           <el-descriptions-item label="集群ip">{{state.form.spec.clusterIP}}</el-descriptions-item>
+           <el-descriptions-item label="服务类型">{{state.form.spec.type}}</el-descriptions-item>
+           <el-descriptions-item label="clusterIPs列表">{{state.form.spec.clusterIPs}}</el-descriptions-item>
+           <el-descriptions-item label="节点亲和性" >{{state.form.spec.sessionAffinity}}</el-descriptions-item>
+           <el-descriptions-item label="服务发现策略" >{{state.form.spec.internalTrafficPolicy}}</el-descriptions-item>
+         </el-descriptions>
+       </el-card>
+       <el-button type="primary" @click="()=>doTo('svc-update',{namespace:state.namespace,name:state.name})" >
+         编辑
+       </el-button>
      </div>
-     <el-divider></el-divider>
-     <el-button type="primary" @click="()=>doTo('sa-update',{namespace:namespace,name:name})" >
-       编辑
-     </el-button>
    </main-layout>
 </template>
 
-<script lang="ts">
-import {defineComponent, inject, reactive, ref, toRefs} from 'vue'
+<script lang="ts" setup>
+import {defineComponent, inject, provide, reactive, ref, toRefs} from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import MainLayout from "../../layout/main.vue";
-import {getNsList} from "../../api/token/namespace/ns";
 import {doTo} from "../../router";
-import {getSaItem, getSaList, SACreate, SaDel} from "../../api/token/sa/sa";
-import {secretDetail} from "../../api/token/secret/secret";
-import {roleCreate} from "../../api/token/rbac";
+import metadataInfo from "../../components/metadataInfo/metadataInfo.vue";
 import {useRoute} from "vue-router";
-
-export default defineComponent({
-  name: 'sa-detail',
-  components: {MainLayout},
-  setup(){
-    let state=reactive({
-      item:{},
-      name:"",
-      namespace:""
-    })
-    const route = useRoute()
-    state.name=route.query.name
-    state.namespace=route.query.namespace
-    async function getData(){
-      try {
-       let tData=await getSaItem(state.namespace,state.name)
-        state.item=tData.data.data
-      }catch (e){
-        console.log(e)
-      }
+import {getSvcItem} from "../../api/token/svc/svc";
+import Port from "../../components/Port/port.vue";
+import LabelValue from "../../components/labelValue/labelValue.vue";
+let state=reactive({
+  form:{
+    metadata:{},
+    spec:{
+      ports:[],
+      selector:{}
     }
-    getData()
-
-    async function showToken(name){
-      try {
-      let result=await secretDetail(state.namespace,name)
-      let token=window.atob(result.data.data.data['token'])
-      state.token=token;
-      state.dialogVisible=true;
-      }catch (e) {
-        console.log(e)
-      }
-
-    }
-
-    return {...toRefs(state),doTo,showToken}
-  }
+  },
+  name:"",
+  namespace:""
 })
+const route = useRoute()
+let mateDataRef=ref(null)
+let portRef=ref(null)
+let selectorRef=ref(null)
+state.name=route.query.name.toString()
+state.namespace=route.query.namespace.toString()
+async function getData(){
+  try {
+    let tData=await getSvcItem(state.namespace,state.name)
+    state.form=tData.data.data
+    mateDataRef.value.setData( state.form.metadata)
+    portRef.value.setData(state.form.spec.ports)
+    selectorRef.value.setData(state.form.spec.selector)
+  }catch (e){
+    console.log(e)
+  }
+}
+getData()
+
+provide("render",true)
 </script>
 <style >
 

@@ -1,69 +1,38 @@
 <template>
    <main-layout>
-     <nav class="nav-bar">
-          <el-breadcrumb separator="/">
-             <el-breadcrumb-item>secret创建</el-breadcrumb-item>
-          </el-breadcrumb>
-     </nav>
-       <el-tabs v-model="mode" @tab-click="Update">
-         <el-tab-pane label="可视化展示" name="json">
-          <mateData @input="getData($event,'metadata',form)" ref="mateDataRef" :nameDisable="true" :nameRequired="true"></mateData>
+     <breadcrumb title="密文.更新"></breadcrumb>
+     <el-button size="small" type="warning" class="btnList" @click="doTo('secret-list')" >进入列表</el-button >
+     <el-tabs v-model="state.mode" @tab-click="Update">
+           <el-tab-pane label="可视化展示" name="json">
+           <metadataInfo ref="mateDataRef" @input="getData($event,'metadata',state.form,true)"  tipTitle="Secret" type="secret" :nameDisable="true" :nameRequired="true"></metadataInfo>
            <el-alert title="同名key会覆盖Data,下面的数据同key数据，且type不允许切换" type="error" />
-          <el-tabs v-model="activeName" @tab-click="changeType" >
+          <el-tabs v-model="state.form.type"  >
            <el-tab-pane label="自定义类型" name="Opaque" disabled>
-             <el-form ref="formRef" :model="tls"   class="mtb20">
-             <KeyValue ref="KeyValueRef" @input="getData($event,'stringData',form)"></KeyValue>
-             </el-form>
+             <KeyValue ref="KeyValueRef" :base64="true"  @input="getData($event,'stringData',state.form,true)" v-if="state.form.type=='Opaque'"></KeyValue>
            </el-tab-pane>
-           <el-tab-pane label="TLS类型" name="tls" disabled>
-             <div v-if="form.type=='kubernetes.io/tls'">
-               <el-alert title="为了统一密文输入必须符合可视化规范，以便后台处理" type="success" />
-               <el-form ref="formRef" :model="tls"   class="mtb20">
-               <el-form-item :prop="'tls_key'"    :rules="requireRules('私钥内容必须填写')" >
-                   <h2 class="sub_title" >私钥内容 tls.key</h2>
-                   <el-input v-model="tls.tls_key" type="textarea" :rows="8" style="width:80%"  placeholder="-----BEGIN RSA PRIVATE KEY-----开头的内容"></el-input>
-                   <el-button style="margin-left:15px;vertical-align: top" type="primary" @click="()=>fileLoad('tls_key')">文件上传</el-button>
-               </el-form-item>
-               <el-divider></el-divider>
-               <h2 class="sub_title"  >证书内容 tls.crt</h2>
-               <el-form-item  :prop="'tls_value'"   :rules="requireRules('证书内容必须填写')" >
-                 <el-input v-model="tls.tls_value" type="textarea" :rows="8"  style="width:80%" placeholder="-----BEGIN CERTIFICATE-----开头的内容"></el-input>
-                 <el-button style="margin-left:15px;vertical-align: top" type="primary" @click="()=>fileLoad('tls_value')">文件上传</el-button>
-               </el-form-item>
-               </el-form>
-             </div>
+            <el-tab-pane label="服务账号令牌" name="kubernetes.io/service-account-token" disabled>
+              <el-alert title="服务账号令牌数据不可以修改" type="warning" />
+            </el-tab-pane>
+           <el-tab-pane label="TLS类型" name="kubernetes.io/tls" disabled>
+              <Tls ref="tlsRef" @input="getData($event,'stringData',state.form,true)" v-if="state.form.type=='kubernetes.io/tls'"></Tls>
            </el-tab-pane>
-            <el-tab-pane label="docker镜像拉取密文" name="docker" disabled>
-              <div v-if="form.type=='kubernetes.io/dockercfg'">
-                <el-alert title="为了统一docker密文输入必须符合可视化规范，以便后台处理" type="success" />
-                <el-form ref="formRef" :model="docker"  class="mtb20" >
-                <el-form-item label="server" label-width="100px" :prop="'server'"  :rules="requireRules('server必须填写')" >
-                  <el-input v-model="docker.server"   placeholder="用户名" autocomplete="off" ></el-input>
-                </el-form-item>
-                <el-form-item label="用户名"  label-width="100px" :prop="'username'"  :rules="requireRules('用户名必须填写')" >
-                  <el-input v-model="docker.username"   placeholder="用户名" autocomplete="off" ></el-input>
-                </el-form-item>
-                <el-form-item label="密码"  label-width="100px" :prop="'password'" :rules="requireRules('密码必须填写')" >
-                  <el-input v-model="docker.password"   type="password"  placeholder="密码" autocomplete="off" ></el-input>
-                </el-form-item>
-                <el-form-item label="邮箱"   label-width="100px" :prop="'email'" :rules="requireRules('邮箱必须填写')" >
-                  <el-input v-model="docker.email"   placeholder="邮箱" autocomplete="off" ></el-input>
-                </el-form-item>
-                </el-form>
-              </div>
+            <el-tab-pane label="docker镜像拉取密文" name="kubernetes.io/dockercfg" disabled>
+              <docker ref="dockerRef" @input="getData($event,'data',state.form,true)" v-if="state.form.type=='kubernetes.io/dockercfg'"></docker>
             </el-tab-pane>
             <el-divider></el-divider>
-            <el-alert title="只读属性,可视化不能修改,为了兼容yaml操作," type="warning" />
+            <el-alert title="只读属性,可视化不能修改,为了兼容yaml操作," type="info" />
             <h2 class="sub_title">Data数据</h2>
             <div  class="list_item">
-              <p v-for=" (value,key) in form.data">
-                <em>key:</em>{{key}} <em>base64后的值:</em> {{value}}
-              </p>
+              <div v-for=" (value,key) in state.form.data">
+                <p><em>key:</em>{{key}}</p>
+                <p><em>base64后的值:</em> {{value}}</p>
+                <el-divider></el-divider>
+              </div>
             </div>
        </el-tabs>
          </el-tab-pane>
            <el-tab-pane label="YAML展示" name="yaml">
-             <yaml ref="yamlRef"  @input="yamlChange" />
+             <yaml ref="yamlRef"  />
            </el-tab-pane>
        </el-tabs>
        <div style="text-align: center;margin-top: 20px">
@@ -72,264 +41,140 @@
    </main-layout>
 </template>
 
-<script lang="ts">
-import {defineComponent, computed, ref, onUnmounted, inject, reactive, toRefs, nextTick, watch, onMounted} from 'vue'
+<script lang="ts" setup>
+import {
+  ref,
+  reactive,
+  nextTick,
+  watch,
+  provide
+} from 'vue'
 import MainLayout from "../../layout/main.vue";
-import {getNsList} from "../../api/token/namespace/ns";
-import {ElLoading, ElMessage} from 'element-plus'
+import {getNsALL} from "../../api/token/namespace/ns";
+import { ElMessage} from 'element-plus'
 import KeyValue from "../../components/key_value/KeyValue.vue";
-import {secretCreate, secretDetail, secretUpdate} from "../../api/token/secret/secret";
+import { secretDetail, secretUpdate} from "../../api/token/secret/secret";
 import {useRoute} from "vue-router";
-import {getData} from "../../helper/helper.ts"
-import md5 from "js-md5";
-import {arrToMap,data2arr} from "../../helper/helper";
-import yaml from "../../components/Ymal/yaml.vue";
-import mateData from "../../components/Metadata/matedata.vue";
+import {getData} from "../../helper/helper"
+
+import yaml from "../../components/yaml/yaml.vue";
+import metadataInfo from "../../components/metadataInfo/metadataInfo.vue";
 import {requireRules} from "../../helper/rules";
-export default defineComponent({
-  name: 'secret-create',
-  components: {
-    MainLayout,
-    KeyValue,
-    yaml,
-    mateData
-  },
-  setup(){
-    let state=reactive({
-      nsList:reactive([]),
+import breadcrumb from "../../components/common/breadcrumb.vue";
+import Docker from "./components/docker.vue";
+import Tls from "./components/tls.vue";
+import {doTo} from "../../router";
+
+let state=reactive({
+  nsList:reactive([]),
+  mode:"json",
+  form:{
+    apiVersion:'v1',
+    Kind:'Secret',
+    metadata:{
       name:"",
       namespace:"",
-      mode:"json",
-      form:{
-        apiVersion:'v1',
-        Kind:'Secret',
-        metadata:{
-          name:"",
-          namespace:""
-        },
-        type:"Opaque",
-        stringData:{},
-        data:{}
-      },
-      type:"",
-      md5:"",
-      apiVersion:'v1',
-      Kind:'Secret',
-      activeName:"Opaque",
-      tls:{
-        tls_key:"",
-        tls_value:"",
-      },
-      docker:{
-        username:"",
-        server:"",
-        password:"",
-        email:""
-      }
-    })
-    const route = useRoute()
-    let loading
-    state.name=route.query.name
-    state.namespace=route.query.namespace
-    let yamlRef=ref(null)
-    let mateDataRef=ref(null)
-    const formRef=ref(null)
-    let KeyValueRef=ref(null)
-    function Update(){
-      nextTick(()=>{
-        yamlRef.value.Update()
-      })
-    }
-    function changeType(tab){
-
-      state.tls.tls_key=""
-      state.tls.tls_value=""
-      state.docker={
-            username:"",
-            server:"",
-            password:"",
-            email:""
-      }
-      state.form.stringData={}
-      state.activeName=tab.props.name
-    }
-    async function getDataItem(){
-      const route = useRoute()
-      try {
-        let tData=await secretDetail(route.query.namespace,route.query.name)
-        state.namespace=tData.data.data.namespace
-        state.name=tData.data.data.name
-        state.type=tData.data.data.typeRaw
-        state.form.stringData=tData.data.data.stringData
-        state.form.data=tData.data.data.data
-        state.form.type=tData.data.data.typeRaw
-        state.form.metadata.namespace=tData.data.data.namespace
-        state.form.metadata.name=tData.data.data.name
-        state.form.metadata.labels=tData.data.data.labels
-        state.form.metadata.annotations=tData.data.data.annotations
-      }catch (e){
-        console.log(e)
-      }
-    }
-    getDataItem()
-    function yamlChange(data){
-      try {
-        if(data){
-          if(data.apiVersion!==state.apiVersion|| data.Kind!=state.Kind){
-            state.form.apiVersion=state.apiVersion
-            state.form.Kind=state.Kind
-            showErr( 'apiVersion和Kind不允许修改',state.mode)
-          }
-          if(data.metadata.namespace!==state.namespace|| data.metadata.name!=state.name){
-            state.form.metadata.namespace=state.namespace
-            state.form.metadata.name=state.name
-            showErr( 'name和namespace不允许修改',state.mode)
-          }
-          if(data.type!==state.type){
-            state.form.type=state.type
-            showErr( 'type不允许修改',state.mode)
-          }
-          state.form=data
-        }
-      }catch (e) {
-        showErr("",state.mode)
-      }
-    }
-
-    async function fetchData(){
-      try {
-       let tData=await getNsList()
-        state.nsList=tData.data.data
-      }catch (e){
-        console.log(e)
-      }
-    }
-
-    fetchData()
-    watch(()=>state.form,()=>{
-      if(state.md5!=md5(JSON.stringify(state.form))){
-
-        yamlRef.value.setData(state.form)
-        mateDataRef.value.setData(state.form.metadata)
-        KeyValueRef.value.setData(state.form.stringData)
-        if( state.form.type=="kubernetes.io/tls"){
-          try {
-            state.tls.tls_key=state.form.stringData["tls.key"]
-            state.tls.tls_value=state.form.stringData["tls.crt"]
-          }catch (e) {
-
-            state.tls.tls_key=""
-            state.tls.tls_value=""
-          }
-        }
-        if( state.form.type=="kubernetes.io/dockercfg"){
-          try {
-            state.docker.username=state.form.stringData.username
-            state.docker.server=state.form.stringData.server
-            state.docker.password=state.form.stringData.password
-            state.docker.email=state.form.stringData.email
-          }catch (e) {
-            state.docker={
-              username:"",
-              server:"",
-              password:"",
-              email:""
-            }
-          }
-
-        }
-        if(state.form.type=="kubernetes.io/tls"&&state.activeName!='tls'){
-          state.activeName='tls'
-        }
-        if( state.form.type=="kubernetes.io/dockercfg"&&state.activeName!='docker'){
-          state.activeName="docker"
-        }
-        if(state.form.type=="Opaque"&&state.activeName!='Opaque'){
-          state.activeName="Opaque"
-        }
-        state.md5=md5(JSON.stringify(state.form))
-      }
-    },{deep:true,flush:"post"})
-    function postNew(){
-
-      formRef.value.validate(async (valid) => {
-        if (valid) {
-          let flag=await mateDataRef.value.Check()
-          if(!flag){
-            return
-          }
-          let flag2=await KeyValueRef.value.Check()
-          if(!flag2){
-            return
-          }
-            let result=await  secretUpdate(state.form)
-            if (result.data.code==200){
-              ElMessage("secret资源修改成功")
-            }
-          }
-      })
-    }
-    function inputKeyValues(input){
-      state.form.rawInput=input
-    }
-    function fileLoad(key){
-       let fileDom= document.createElement("input")
-           fileDom.accept=".txt,.pem,.key,.pkey"
-           fileDom.type="file"
-           fileDom.onchange=function (e) {
-             const reader=new FileReader()
-             reader.readAsText(e.target.files[0],'UTF-8')
-             reader.onload=(e)=>{
-               state.tls[key]=e.target.result
-             }
-           }
-           fileDom.click();
-    }
-    watch(()=> state.tls.tls_key,()=>{
-      if(state.form.type=="kubernetes.io/tls"){
-        state.form.stringData["tls.key"]=state.tls.tls_key
-      }
-    },{deep:true,flush:"post"})
-    watch(()=> state.tls.tls_value,()=>{
-      if(state.form.type=="kubernetes.io/tls"){
-        state.form.stringData["tls.crt"]=state.tls.tls_value
-      }
-    },{deep:true,flush:"post"})
-    watch(()=> state.docker,()=>{
-      if( state.form.type=="kubernetes.io/dockercfg"){
-        state.form.stringData=state.docker
-      }
-    },{deep:true,flush:"post"})
-
-
-    function showErr(msg,mode){
-      loading=ElLoading.service({
-        lock: true,
-        text: '',
-        spinner:"failed",
-        background: 'rgba(0, 0, 0, 0.7)',
-      })
-      ElMessage({
-        type: 'error',
-        grouping: true,
-        message:msg||"YAML内容有误,请仔细编辑",
-        showClose:true,
-        duration:0,
-        onClose:back(mode)
-      })
-    }
-    function back(mode){
-      return function () {
-        loading.close()
-        nextTick(function () {
-          state.mode=mode
-          Update()
-        })
-      }
-
-    }
-
-    return {...toRefs(state),postNew,inputKeyValues,formRef,fileLoad,mateDataRef,yamlChange,mateDataRef,KeyValueRef,yamlRef,getData,Update,changeType,requireRules,data2arr}
-  }
+      labels:{},
+      annotations:{},
+    },
+    type:"Opaque",
+    stringData:{},
+    data:{}
+  },
+  md5:"",
 })
+const route = useRoute()
+provide("render",false)
+
+state.form.metadata.name=route.query.name.toString()
+state.form.metadata.namespace=route.query.namespace.toString()
+let yamlRef=ref(null)
+let mateDataRef=ref(null)
+let tlsRef=ref(null)
+let KeyValueRef=ref(null)
+let dockerRef=ref(null)
+
+function Update(){
+  nextTick(()=>{
+    yamlRef.value.Update()
+  })
+}
+
+async function getDataItem(){
+  try {
+    let tData=await secretDetail(state.form.metadata.namespace,state.form.metadata.name)
+    let secret=tData.data.data
+    state.form=secret.Secret
+    mateDataRef.value.setData(secret.Secret.metadata)
+    yamlRef.value.setData(state.form)
+    if (state.form.type=="Opaque"){
+      nextTick(()=>{
+        KeyValueRef.value.setData(state.form.data)
+      })
+
+    }
+    if (state.form.type=="kubernetes.io/tls"){
+      nextTick(()=>{
+        tlsRef.value.setData(state.form.data)
+      })
+
+    }
+    if (state.form.type=="kubernetes.io/dockercfg"){
+      nextTick(()=>{
+        dockerRef.value.setData(state.form.data)
+      })
+
+    }
+  }catch (e){
+    console.log(e)
+  }
+}
+getDataItem()
+
+
+async function fetchData(){
+  try {
+    let tData=await getNsALL()
+    state.nsList=tData.data.data
+  }catch (e){
+    console.log(e)
+  }
+}
+
+fetchData()
+//
+watch(()=>state.form,()=>{
+    yamlRef.value.setData(state.form)
+},{deep:true,flush:"post"})
+
+async  function postNew(){
+  let flag=await mateDataRef.value.Check()
+
+  if (state.form.type=="Opaque"){
+    flag=flag&&await KeyValueRef.value.Check()
+  }
+  if (state.form.type=="kubernetes.io/tls"){
+    flag=flag&&await tlsRef.value.Check()
+  }
+
+  if (state.form.type=="kubernetes.io/dockercfg"){
+    flag=flag&&await dockerRef.value.Check()
+  }
+  if(!flag){
+    ElMessage.error("数据不合法，有必选项未填")
+    return
+  }
+   try {
+        let result=await  secretUpdate(state.form)
+        if (result.data.code==200){
+          ElMessage("secret资源修改成功")
+        }
+    }catch (e){
+      ElMessage.error(e)
+    }
+}
+
+
+
+
 </script>

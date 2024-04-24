@@ -1,261 +1,140 @@
 <template>
-   <main-layout class="fix-black">
-     <nav class="nav-bar">
-          <el-breadcrumb separator="/">
-             <el-breadcrumb-item>服务账号编辑</el-breadcrumb-item>
-          </el-breadcrumb>
-     </nav>
-     <el-form :inline="true"  :model="form" ref="formRef"  >
-     <el-tabs v-model="mode" @tab-click="Update">
-       <el-tab-pane label="可视化展示" name="json">
-         <mateData @input="getData($event,'metadata',form)" ref="mateDataRef" :nameDisable="true" :nameRequired="true"></mateData>
-         <el-card class="box-card">
-           <template #header>
-             <div class="card-header mtb20" >
-               密文
-               <el-button type="success" size="small" style="float: right;margin-right:50px" @click="addSecrets" >添加密文</el-button>
-             </div>
-           </template>
-           <div v-for="(item,index) in form.secrets" class="mtb20">
-               <el-form-item
-                   label="密文名称"
-                   :key="'secrets'+index+'name'"
-                   :prop="'secrets.'+index+'.name'"
-                   :rules="requireRules('密文名称必须填写')"
-               >
-                 <el-select  size="small" v-model="item.name" class="selectLong" filterable>
-                   <el-option :key="item.name" v-for="item in secret" :label="item.name" :value="item.name"/>
-                 </el-select>
-               </el-form-item>
-               <el-form-item  >
-                 <el-button size="small" type="danger" @click="removeSecretItems(index,'secrets')" >删除该项items</el-button>
-               </el-form-item>
-           </div>
-         </el-card>
-         <el-card class="box-card">
-           <template #header>
-             <div class="card-header mtb20" >
-               镜像密文
-               <el-button type="success" size="small" style="float: right;margin-right:50px" @click="addImagePullSecrets" >添加镜像密文</el-button>
-             </div>
-           </template>
-           <div v-for="(item,index) in form.imagePullSecrets" class="mtb20">
-             <el-form-item
-                 label="密文名称"
-                 :key="'imagePullSecrets'+index+'name'"
-                 :prop="'imagePullSecrets.'+index+'.name'"
-                 :rules="requireRules('密文名称必须填写')"
-             >
-               <el-select  size="small" v-model="item.name" class="selectLong" filterable>
-                 <el-option :key="item.name" v-for="item in secret" :label="item.name" :value="item.name"/>
-               </el-select>
-             </el-form-item>
-             <el-form-item  >
-               <el-button size="small" type="danger" @click="removeSecretItems(index,'imagePullSecrets')" >删除该项items</el-button>
-             </el-form-item>
-           </div>
-         </el-card>
-       </el-tab-pane>
-       <el-tab-pane label="YAML展示" name="yaml">
-         <yaml ref="yamlRef"  @input="yamlChange" />
-       </el-tab-pane>
-     </el-tabs>
-     <el-divider></el-divider>
-     <div style="text-align: center;margin-top: 20px">
-       <el-button type="primary" @click="post()">保存</el-button>
-     </div>
-     </el-form>
-   </main-layout>
+  <main-layout class="fix-black">
+    <breadcrumb title="服务.更新"></breadcrumb>
+      <el-form :inline="true"  :model="state.form" ref="formRef"  >
+        <el-button size="small" type="warning" class="btnList" @click="doTo('sa-list')" >进入列表</el-button >
+        <el-tabs v-model="state.mode" @tab-click="Update">
+          <el-tab-pane label="可视化展示" name="json">
+            <metadataInfo tipTitle="Service" :nameDisable="true"   @input="getData($event,'metadata',state.form,true)" ref="metadataInfoRef"  :nameRequired="true"></metadataInfo>
+            <port ref="portRef" :type="state.form.spec.type"   @input="getData($event,'ports',state.form.spec,true)"></port>
+            <labelValue ref="selectorRef"  label="Selector设置"  @input="getData($event,'selector',state.form.spec,true)"></labelValue>
+            <el-divider></el-divider>
+            <h2>其他配置</h2>
+            <el-form-item class="flex1"  label="clusterIP">
+              <el-select v-model="state.form.spec.clusterIP">
+                <el-option label="无头服务" value="none"></el-option>
+                <el-option label="集群服务" value="''"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item class="flex1"  label="服务类型">
+              <el-select v-model="state.form.spec.type">
+                <el-option label="ClusterIP" value="ClusterIP"></el-option>
+                <el-option label="NodePort" value="NodePort"></el-option>
+                <el-option label="LoadBalancer" value="LoadBalancer"></el-option>
+                <el-option label="ExternalName" value="ExternalName"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item class="flex1"  label="节点亲和性">
+              <el-select v-model="state.form.spec.sessionAffinity">
+                <el-option label="ClientIP" value="ClientIP"></el-option>
+                <el-option label="None" value="None"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item class="flex1"  label="服务发现策略">
+              <el-select v-model="state.form.spec.internalTrafficPolicy">
+                <el-option label="Cluster" value="Cluster"></el-option>
+                <el-option label="Local" value="Local"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane :label="'YAML展示'" name="yaml">
+            <yaml ref="yamlRef"   />
+          </el-tab-pane>
+        </el-tabs>
+        <el-divider></el-divider>
+        <div  class="submit-box">
+          <el-button  type="info" @click="post()">更新</el-button>
+        </div>
+      </el-form>
+    </main-layout>
 </template>
 
-<script lang="ts">
-import {defineComponent, inject, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
-import {ElMessageBox, ElMessage, ElLoading} from 'element-plus'
+<script lang="ts" setup>
+import {defineComponent, inject, nextTick, provide, reactive, ref, toRefs, watch} from 'vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import MainLayout from "../../layout/main.vue";
-import {getNsList} from "../../api/token/namespace/ns";
 import {doTo} from "../../router";
-import {getSaItem, getSaList, SACreate, SaDel, SAUpdate} from "../../api/token/sa/sa";
-import {secretAllByNs, secretDetail} from "../../api/token/secret/secret";
-import {roleCreate} from "../../api/token/rbac";
+import metadataInfo from "../../components/metadataInfo/metadataInfo.vue";
 import {useRoute} from "vue-router";
-import yaml from "../../components/Ymal/yaml.vue";
-import mateData from "../../components/Metadata/matedata.vue";
-import {requireRules,inArrayWithMsg} from "../../helper/rules.ts"
-import md5 from 'js-md5';
-import {getData} from "../../helper/helper.ts"
-import {pvcAllByNs} from "../../api/token/pvc";
-import {configmapAllByNs} from "../../api/token/configmap/configmap";
-export default defineComponent({
-  name: 'sa-detail',
-  components: {MainLayout,yaml,mateData},
-  setup(){
-    let state=reactive({
-      item:{},
-      name:"",
-      namespace:"",
-      mode:"json",
-      form:{
-        apiVersion:'v1',
-        Kind:'ServiceAccount',
-        metadata:{
-          name:"",
-          namespace:""
-        },
-        secrets:[],
-        imagePullSecrets:[]
-      },
-      md5:"",
-      history:{},
-      secret:[],
-      apiVersion:'v1',
-      Kind:'ServiceAccount',
-    })
-    const route = useRoute()
-    let loading
+import {createSvc, getSvcItem, UpdateSvc} from "../../api/token/svc/svc";
+import Port from "../../components/Port/port.vue";
+import breadcrumb from "../../components/common/breadcrumb.vue";
+import yaml from "../../components/yaml/yaml.vue";
+import {getData} from "../../helper/helper"
 
-    let yamlRef=ref(null)
-    let mateDataRef=ref(null)
-    const formRef=ref(null)
-    async function getDataItem(){
-      try {
-       let tData=await getSaItem(route.query.namespace,route.query.name)
-        state.item=tData.data.data
-        state.form.metadata.name=state.item.name
-        state.form.metadata.namespace=state.item.namespace
-        state.form.secrets=tData.data.data.secrets||[]
-        state.form.imagePullSecrets=tData.data.data.imagePullSecrets||[]
-        state.name=state.item.name
-        state.namespace=state.item.namespace
-        state.form.metadata.labels=tData.data.data.labels
-        state.form.metadata.annotations=tData.data.data.annotations
-      }catch (e){
-        console.log(e)
-      }
+import LabelValue from "../../components/labelValue/labelValue.vue";
+import {CheckData, createTip} from "../../helper/helper";
+import {SAUpdate} from "../../api/token/sa/sa";
+let state=reactive({
+  form:{
+    metadata:{},
+    spec:{
+      ports:[],
+      selector:{},
+      clusterIP:"",
+      type:"ClusterIP",
+      sessionAffinity:"None",
+      internalTrafficPolicy:"Cluster"
     }
-    getDataItem()
-
-
-    function Update(){
-      nextTick(()=>{
-        yamlRef.value.Update()
-      })
-    }
-    function yamlChange(data){
-      try {
-        if(data){
-
-          if(data.apiVersion!==state.apiVersion|| data.Kind!=state.Kind){
-            state.form.apiVersion=state.apiVersion
-            state.form.Kind=state.Kind
-            showErr( 'apiVersion和Kind不允许修改',state.mode)
-          }
-          if(data.metadata.namespace!==state.namespace|| data.metadata.name!=state.name){
-            state.form.metadata.namespace=state.namespace
-            state.form.metadata.name=state.name
-            showErr( 'name和namespace不允许修改',state.mode)
-          }
-          state.form=data
-        }
-      }catch (e) {
-        showErr("",state.mode)
-      }
-    }
-
-    watch(()=>state.form,()=>{
-      if(state.md5!=md5(JSON.stringify(state.form))){
-        state.md5=md5(JSON.stringify(state.form))
-        yamlRef.value.setData(state.form)
-        mateDataRef.value.setData(state.form.metadata)
-      }
-    },{deep:true,flush:"post"})
-    function addSecrets() {
-        if( state.form.secrets){
-          state.form.secrets.push({name:""})
-        }else{
-          state.form.secrets=[{name:""}]
-        }
-
-    }
-    function addImagePullSecrets() {
-      if( state.form.imagePullSecrets){
-        state.form.imagePullSecrets.push({name:""})
-      }else{
-        state.form.imagePullSecrets=[{name:""}]
-      }
-
-    }
-    watch(()=>state.form.metadata.namespace,()=>{
-      fetchData(state.form.metadata.namespace)
-    })
-    async function fetchData(ns){
-      try {
-        let secret=await  secretAllByNs(ns)
-        state.secret=secret.data.data
-      }catch (e){
-        console.log(e)
-      }
-
-    }
-    function removeSecretItems(index,name) {
-      state.form[name].splice(index,1)
-    }
-    function showErr(msg,mode){
-      loading=ElLoading.service({
-        lock: true,
-        text: '',
-        spinner:"failed",
-        background: 'rgba(0, 0, 0, 0.7)',
-      })
-      ElMessage({
-        type: 'error',
-        grouping: true,
-        message:msg||"YAML内容有误,请仔细编辑",
-        showClose:true,
-        duration:0,
-        onClose:back(mode)
-      })
-    }
-    function back(mode){
-      return function () {
-        loading.close()
-        nextTick(function () {
-          state.mode=mode
-          Update()
-        })
-      }
-
-    }
-    function post(){
-      ElMessageBox.confirm(
-          '你确定继续操作吗?',
-          'Warning',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-          }
-      )
-          .then(async () => {
-                  formRef.value.validate(async (valid) => {
-                    if (valid) {
-                      try {
-                        let result= await  SAUpdate(state.form)
-                        if (result.data.code==200){
-                          ElMessage("SA资源修改成功")
-                          doTo('sa-detail',{name_space:state.name_space,name:state.name})
-                        }
-                      }catch (e){
-                        console.log(e)
-                      }
-
-                    }
-                  })
-          })
-    }
-
-    return {...toRefs(state),doTo,Update,yamlRef,mateDataRef,yamlChange,getData,formRef,requireRules,addSecrets,addImagePullSecrets,removeSecretItems,post}
-  }
+  },
+  name:"",
+  namespace:"",
+  mode:"json"
 })
+const route = useRoute()
+let metadataInfoRef=ref(null)
+let portRef=ref(null)
+let selectorRef=ref(null)
+let formRef=ref(null)
+let yamlRef = ref(null)
+state.name=route.query.name.toString()
+state.namespace=route.query.namespace.toString()
+async function InitData(){
+  try {
+    let tData=await getSvcItem(state.namespace,state.name)
+    state.form=tData.data.data
+    metadataInfoRef.value.setData( state.form.metadata)
+    portRef.value.setData(state.form.spec.ports)
+    selectorRef.value.setData(state.form.spec.selector)
+  }catch (e){
+    console.log(e)
+  }
+}
+watch(() => state.form, () => {
+  yamlRef.value.setData(state.form)
+}, {deep: true, flush: "post"})
+
+function Update(){
+  nextTick(()=>{
+    yamlRef.value.Update()
+  })
+}
+let checkList=[portRef,metadataInfoRef,selectorRef]
+InitData()
+function post() {
+  createTip()
+      .then(async () => {
+        if(await CheckData(checkList)&& await formRef.value.validate()){
+          try {
+            if (state.form.spec.clusterIP!='None'){
+              delete state.form.spec.clusterIP
+            }
+            if (state.form.spec.type!="NodePort"){
+              for (let i in state.form.spec.ports){
+                delete this.state.form.spec.ports[i].nodePort
+              }
+            }
+            let result=await UpdateSvc(state.form)
+            if (result.data.code==200){
+              ElMessage("修改svc成功")
+            }
+          }catch (e){
+            ElMessage.error(e)
+          }
+        }
+      })
+}
+
 </script>
 <style >
 

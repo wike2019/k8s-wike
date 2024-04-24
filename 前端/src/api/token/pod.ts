@@ -1,6 +1,6 @@
 import request from "./read";
 export  function  getPodsByNs(ns:string,page:number){
-    return request.get("/v1/pods",{params:{ns,current:page}})
+    return request.get("/v1/pods",{params:{ns,page:page}})
 }
 
 export  function  getPodsContainers(ns,name){

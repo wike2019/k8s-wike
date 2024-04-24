@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 
 //加载根组件
@@ -12,7 +13,9 @@ const app = createApp(App)
 //引入router
 import router from './router/index'
 
-app.use(ElementPlus)
+app.use(ElementPlus,{
+    locale: zhCn,
+})
 
 app.use(router)
 
